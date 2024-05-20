@@ -1,0 +1,10 @@
+node_modules
+src/models
+amplify-codegen-temp/node_modules
+
+amplify-dependent-resources-ref.d.ts
+aws-exports.js
+event.ts
+amplify-codegen-temp/models/models
+
+src/models/models

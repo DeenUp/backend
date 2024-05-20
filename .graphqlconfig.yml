@@ -1,0 +1,19 @@
+projects:
+  DeenDownAPI:
+    schemaPath: amplify/backend/api/DeenDownAPI/build/schema.graphql
+    includes:
+      - src/graphql/**/*.ts
+    excludes:
+      - ./amplify/**
+      - src/graphql/api.ts
+    extensions:
+      amplify:
+        codeGenTarget: typescript
+        generatedFileName: src/graphql/api.ts
+        docsFilePath: src/graphql
+        region: ca-central-1
+        apiId: null
+        maxDepth: 3
+extensions:
+  amplify:
+    version: 3
