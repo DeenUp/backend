@@ -1,0 +1,98 @@
+# ---------------------------------------------------- MODELS
+
+type GameRound @model @auth(rules: [{ allow: private }]) {
+	id: ID!
+	index: Int!
+	question: String!
+	correctAnswer: String!
+	isComplete: Boolean! @default(value: "false")
+	submittedAnswers: [SubmittedAnswer!]!
+		@hasMany(indexName: "byGameRound", fields: ["id"])
+	gameSessionID: ID!
+		@index(name: "byGameSession", queryField: "getGameRoundByGameSessionID")
+	gameSession: GameSession! @belongsTo(fields: ["gameSessionID"])
+	updatedAt: AWSDateTime!
+	createdAt: AWSDateTime!
+}
+
+type SubmittedAnswer @model @auth(rules: [{ allow: private }]) {
+	id: ID!
+	answer: String!
+	isCorrect: Boolean
+	userID: ID! @index(name: "byUser", queryField: "getSubmittedAnswerByUserID")
+	user: User! @belongsTo(fields: ["userID"])
+	gameRoundID: ID!
+		@index(
+			name: "byGameRound"
+			queryField: "getSubmittedAnswerByGameRoundID"
+		)
+	gameRound: GameRound! @belongsTo(fields: ["gameRoundID"])
+	updatedAt: AWSDateTime!
+	createdAt: AWSDateTime!
+}
+
+type GameSession @model @auth(rules: [{ allow: private }]) {
+	id: ID!
+	lobbyID: ID! @index(name: "byLobby", queryField: "getGameSessionByLobbyID")
+	lobby: Lobby! @belongsTo(fields: ["lobbyID"])
+	rounds: [GameRound!]! @hasMany(indexName: "byGameSession", fields: ["id"])
+	updatedAt: AWSDateTime!
+	createdAt: AWSDateTime!
+}
+
+type Lobby @model @auth(rules: [{ allow: private }]) {
+	id: ID!
+	code: String! @index(name: "byCode", queryField: "getLobbyByCode")
+	isActive: Boolean! @default(value: "true")
+	participants: [User] @manyToMany(relationName: "Participant")
+	creatorID: ID! @index(name: "byCreator", queryField: "getLobbyByCreatorID")
+	creator: User! @belongsTo(fields: ["creatorID"])
+	gameSessionID: ID
+		@index(name: "byGameSession", queryField: "getLobbyByGameSessionID")
+	gameSession: GameSession @hasOne(fields: ["gameSessionID"])
+	updatedAt: AWSDateTime!
+	createdAt: AWSDateTime!
+}
+
+type Question
+	@model(queries: { get: null }, mutations: null, subscriptions: null)
+	@auth(rules: [{ allow: private }]) {
+	text: ID! @primaryKey
+	answers: [Answer!]!
+}
+
+type User
+	@model(mutations: { create: null, update: "updateUser", delete: null })
+	@auth(rules: [{ allow: private }]) {
+	id: ID!
+	email: AWSEmail! @index(name: "byEmail", queryField: "getUserByEmail")
+	name: String!
+	selfie: String
+	status: UserStatus! @default(value: "ACTIVE")
+	type: UserType! @default(value: "PLAYER")
+	createdLobbies: [Lobby] @hasMany(indexName: "byCreator", fields: ["id"])
+	joinedLobbies: [Lobby] @manyToMany(relationName: "Participant")
+	submittedAnswers: [SubmittedAnswer]
+		@hasMany(indexName: "byUser", fields: ["id"])
+	updatedAt: AWSDateTime!
+	createdAt: AWSDateTime!
+}
+
+# ---------------------------------------------------- TYPES
+
+type Answer {
+	text: String!
+	isCorrect: Boolean!
+}
+
+# ---------------------------------------------------- ENUMS
+
+enum UserStatus {
+	ACTIVE
+	SUSPENDED
+}
+
+enum UserType {
+	ADMIN
+	PLAYER
+}

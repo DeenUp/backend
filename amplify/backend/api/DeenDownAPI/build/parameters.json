@@ -1,0 +1,13 @@
+{
+    "AppSyncApiName": "DeenDownAPI",
+    "DynamoDBBillingMode": "PAY_PER_REQUEST",
+    "DynamoDBEnableServerSideEncryption": false,
+    "AuthCognitoUserPoolId": {
+        "Fn::GetAtt": [
+            "authDeenDownAuth",
+            "Outputs.UserPoolId"
+        ]
+    },
+    "S3DeploymentBucket": "amplify-deendown-dev-145459-deployment",
+    "S3DeploymentRootKey": "amplify-appsync-files/98ca8d4bb7163945c2f4fe7701692b39fcd574de"
+}

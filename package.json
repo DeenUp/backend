@@ -1,0 +1,55 @@
+{
+	"name": "@deenup/deendown",
+	"version": "0.1.0",
+	"description": "Backend for DeenUp",
+	"private": true,
+	"engines": {
+		"node": ">=20.11.0"
+	},
+	"packageManager": "pnpm@9.0.6",
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/zxcvbnmmohd/DeenDown.git"
+	},
+	"bugs": {
+		"url": "https://github.com/zxcvbnmmohd/DeenDown/issues"
+	},
+	"scripts": {
+		"amplify:AdminQueriesd82aff64": "cd amplify/backend/function/AdminQueriesd82aff64/src && pnpm i && pnpm build && cd -",
+		"amplify:DeenDownAuthCustomMessage": "cd amplify/backend/function/DeenDownAuthCustomMessage/src && pnpm i && pnpm build && cd -",
+		"amplify:DeenDownAuthPostAuthentication": "cd amplify/backend/function/DeenDownAuthPostAuthentication/src && pnpm i && pnpm build && cd -",
+		"amplify:DeenDownAuthPostConfirmation": "cd amplify/backend/function/DeenDownAuthPostConfirmation/src && pnpm i && pnpm build && cd -",
+		"amplify:DeenDownAuthPreAuthentication": "cd amplify/backend/function/DeenDownAuthPreAuthentication/src && pnpm i && pnpm build && cd -",
+		"amplify:DeenDownAuthPreSignup": "cd amplify/backend/function/DeenDownAuthPreSignup/src && pnpm i && pnpm build && cd -",
+		"format": "prettier --check .",
+		"format:fix": "prettier --write .",
+		"lint": "eslint . --ext .ts",
+		"lint:fix": "eslint . --ext .ts --fix",
+		"typecheck": "tsc --noEmit",
+		"prepare": "husky"
+	},
+	"devDependencies": {
+		"@typescript-eslint/eslint-plugin": "^6.7.5",
+		"@typescript-eslint/parser": "^6.7.5",
+		"enforce-branch-name": "^1.1.2",
+		"eslint": "^8.51.0",
+		"eslint-config-prettier": "^9.0.0",
+		"eslint-plugin-prettier": "^5.0.0",
+		"eslint-plugin-security": "^1.7.1",
+		"eslint-plugin-simple-import-sort": "^10.0.0",
+		"husky": "^9.0.11",
+		"lint-staged": "^15.2.2",
+		"pnpm": "^9.0.6",
+		"prettier": "^3.2.5"
+	},
+	"husky": {
+		"hooks": {
+			"pre-commit": "lint-staged"
+		}
+	},
+	"lint-staged": {
+		"*.*": [
+			"pnpm format:fix"
+		]
+	}
+}

@@ -1,0 +1,30 @@
+{
+	"version": "1",
+	"region": "ca-central-1",
+	"userPoolId": "ca-central-1_xbHQ8ebi3",
+	"userName": "f46e5562-aa3a-4819-99cd-efe87a2f4d03",
+	"callerContext": {
+		"awsSdkVersion": "aws-sdk-unknown-unknown",
+		"clientId": "4dhanlfjf4bb1e9mf5q4e0ipcm"
+	},
+	"triggerSource": "PreSignUp_SignUp",
+	"request": {
+		"userAttributes": {
+			"cognito:user_status": "CONFIRMED",
+			"cognito:email_alias": "mohd@mohd.ca",
+			"custom:user_type": "CUSTOMER",
+			"email": "mohd@mohd.ca",
+			"email_verified": "true",
+			"family_name": "Mohamed",
+			"given_name": "Mohamed",
+			"sub": "fd8bed41-06ae-43fb-ad5d-e145b94b0a65"
+		},
+		"validationData": null,
+		"userNotFound": true
+	},
+	"response": {
+		"autoConfirmUser": false,
+		"autoVerifyEmail": false,
+		"autoVerifyPhone": false
+	}
+}

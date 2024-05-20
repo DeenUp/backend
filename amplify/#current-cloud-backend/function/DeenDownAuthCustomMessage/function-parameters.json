@@ -1,0 +1,14 @@
+{
+	"trigger": true,
+	"modules": ["verification-link"],
+	"parentResource": "DeenDownAuth",
+	"functionName": "DeenDownAuthCustomMessage",
+	"resourceName": "DeenDownAuthCustomMessage",
+	"parentStack": "auth",
+	"triggerEnvs": "[\n  {\n    \"key\": \"RESOURCENAME\",\n    \"value\": \"resourceName\"\n  }\n]",
+	"triggerDir": "/snapshot/amplify-cli/build/node_modules/@aws-amplify/amplify-category-auth/provider-utils/awscloudformation/triggers/CustomMessage",
+	"triggerTemplate": "CustomMessage.json.ejs",
+	"triggerEventPath": "CustomMessage.event.json",
+	"roleName": "DeenDownAuthCustomMessage",
+	"skipEdit": true
+}

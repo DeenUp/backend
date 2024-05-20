@@ -1,0 +1,1100 @@
+{
+    "Parameters": {
+        "env": {
+            "Type": "String",
+            "Default": "NONE"
+        },
+        "AppSyncApiName": {
+            "Type": "String",
+            "Default": "AppSyncSimpleTransform"
+        },
+        "authRoleName": {
+            "Type": "String"
+        },
+        "unauthRoleName": {
+            "Type": "String"
+        },
+        "AuthCognitoUserPoolId": {
+            "Type": "String"
+        },
+        "DynamoDBModelTableReadIOPS": {
+            "Type": "Number",
+            "Default": 5,
+            "Description": "The number of read IOPS the table should support."
+        },
+        "DynamoDBModelTableWriteIOPS": {
+            "Type": "Number",
+            "Default": 5,
+            "Description": "The number of write IOPS the table should support."
+        },
+        "DynamoDBBillingMode": {
+            "Type": "String",
+            "Default": "PAY_PER_REQUEST",
+            "AllowedValues": [
+                "PAY_PER_REQUEST",
+                "PROVISIONED"
+            ],
+            "Description": "Configure @model types to create DynamoDB tables with PAY_PER_REQUEST or PROVISIONED billing modes."
+        },
+        "DynamoDBEnablePointInTimeRecovery": {
+            "Type": "String",
+            "Default": "false",
+            "AllowedValues": [
+                "true",
+                "false"
+            ],
+            "Description": "Whether to enable Point in Time Recovery on the table."
+        },
+        "DynamoDBEnableServerSideEncryption": {
+            "Type": "String",
+            "Default": "true",
+            "AllowedValues": [
+                "true",
+                "false"
+            ],
+            "Description": "Enable server side encryption powered by KMS."
+        },
+        "S3DeploymentBucket": {
+            "Type": "String",
+            "Description": "An S3 Bucket name where assets are deployed"
+        },
+        "S3DeploymentRootKey": {
+            "Type": "String",
+            "Description": "An S3 key relative to the S3DeploymentBucket that points to the root of the deployment directory."
+        }
+    },
+    "Resources": {
+        "GraphQLAPI": {
+            "Type": "AWS::AppSync::GraphQLApi",
+            "Properties": {
+                "AuthenticationType": "AMAZON_COGNITO_USER_POOLS",
+                "Name": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            {
+                                "Ref": "AppSyncApiName"
+                            },
+                            "-",
+                            {
+                                "Ref": "env"
+                            }
+                        ]
+                    ]
+                },
+                "AdditionalAuthenticationProviders": [
+                    {
+                        "AuthenticationType": "API_KEY"
+                    },
+                    {
+                        "AuthenticationType": "AWS_IAM"
+                    }
+                ],
+                "UserPoolConfig": {
+                    "AwsRegion": {
+                        "Ref": "AWS::Region"
+                    },
+                    "DefaultAction": "ALLOW",
+                    "UserPoolId": {
+                        "Ref": "AuthCognitoUserPoolId"
+                    }
+                }
+            }
+        },
+        "GraphQLAPITransformerSchema3CB2AE18": {
+            "Type": "AWS::AppSync::GraphQLSchema",
+            "Properties": {
+                "ApiId": {
+                    "Fn::GetAtt": [
+                        "GraphQLAPI",
+                        "ApiId"
+                    ]
+                },
+                "DefinitionS3Location": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "s3://",
+                            {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "/",
+                            {
+                                "Ref": "S3DeploymentRootKey"
+                            },
+                            "/schema.graphql"
+                        ]
+                    ]
+                }
+            }
+        },
+        "GraphQLAPIDefaultApiKey215A6DD7": {
+            "Type": "AWS::AppSync::ApiKey",
+            "Properties": {
+                "ApiId": {
+                    "Fn::GetAtt": [
+                        "GraphQLAPI",
+                        "ApiId"
+                    ]
+                },
+                "Expires": 1745842115
+            }
+        },
+        "GraphQLAPINONEDS95A13CF0": {
+            "Type": "AWS::AppSync::DataSource",
+            "Properties": {
+                "ApiId": {
+                    "Fn::GetAtt": [
+                        "GraphQLAPI",
+                        "ApiId"
+                    ]
+                },
+                "Name": "NONE_DS",
+                "Type": "NONE",
+                "Description": "None Data Source for Pipeline functions"
+            }
+        },
+        "GameRound": {
+            "Type": "AWS::CloudFormation::Stack",
+            "Properties": {
+                "TemplateURL": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "https://s3.",
+                            {
+                                "Ref": "AWS::Region"
+                            },
+                            ".",
+                            {
+                                "Ref": "AWS::URLSuffix"
+                            },
+                            "/",
+                            {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "/",
+                            {
+                                "Ref": "S3DeploymentRootKey"
+                            },
+                            "/stacks/GameRound.json"
+                        ]
+                    ]
+                },
+                "Parameters": {
+                    "DynamoDBModelTableReadIOPS": {
+                        "Ref": "DynamoDBModelTableReadIOPS"
+                    },
+                    "DynamoDBModelTableWriteIOPS": {
+                        "Ref": "DynamoDBModelTableWriteIOPS"
+                    },
+                    "DynamoDBBillingMode": {
+                        "Ref": "DynamoDBBillingMode"
+                    },
+                    "DynamoDBEnablePointInTimeRecovery": {
+                        "Ref": "DynamoDBEnablePointInTimeRecovery"
+                    },
+                    "DynamoDBEnableServerSideEncryption": {
+                        "Ref": "DynamoDBEnableServerSideEncryption"
+                    },
+                    "referencetotransformerrootstackenv10C5A902Ref": {
+                        "Ref": "env"
+                    },
+                    "referencetotransformerrootstackGraphQLAPI20497F53ApiId": {
+                        "Fn::GetAtt": [
+                            "GraphQLAPI",
+                            "ApiId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGraphQLAPINONEDS2BA9D1C8Name": {
+                        "Fn::GetAtt": [
+                            "GraphQLAPINONEDS95A13CF0",
+                            "Name"
+                        ]
+                    },
+                    "referencetotransformerrootstackS3DeploymentBucket7592718ARef": {
+                        "Ref": "S3DeploymentBucket"
+                    },
+                    "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref": {
+                        "Ref": "S3DeploymentRootKey"
+                    },
+                    "referencetotransformerrootstackauthRoleNameFB872D50Ref": {
+                        "Ref": "authRoleName"
+                    },
+                    "referencetotransformerrootstackunauthRoleName49F3C1FERef": {
+                        "Ref": "unauthRoleName"
+                    }
+                }
+            },
+            "DependsOn": [
+                "GraphQLAPITransformerSchema3CB2AE18"
+            ]
+        },
+        "SubmittedAnswer": {
+            "Type": "AWS::CloudFormation::Stack",
+            "Properties": {
+                "TemplateURL": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "https://s3.",
+                            {
+                                "Ref": "AWS::Region"
+                            },
+                            ".",
+                            {
+                                "Ref": "AWS::URLSuffix"
+                            },
+                            "/",
+                            {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "/",
+                            {
+                                "Ref": "S3DeploymentRootKey"
+                            },
+                            "/stacks/SubmittedAnswer.json"
+                        ]
+                    ]
+                },
+                "Parameters": {
+                    "DynamoDBModelTableReadIOPS": {
+                        "Ref": "DynamoDBModelTableReadIOPS"
+                    },
+                    "DynamoDBModelTableWriteIOPS": {
+                        "Ref": "DynamoDBModelTableWriteIOPS"
+                    },
+                    "DynamoDBBillingMode": {
+                        "Ref": "DynamoDBBillingMode"
+                    },
+                    "DynamoDBEnablePointInTimeRecovery": {
+                        "Ref": "DynamoDBEnablePointInTimeRecovery"
+                    },
+                    "DynamoDBEnableServerSideEncryption": {
+                        "Ref": "DynamoDBEnableServerSideEncryption"
+                    },
+                    "referencetotransformerrootstackenv10C5A902Ref": {
+                        "Ref": "env"
+                    },
+                    "referencetotransformerrootstackGraphQLAPI20497F53ApiId": {
+                        "Fn::GetAtt": [
+                            "GraphQLAPI",
+                            "ApiId"
+                        ]
+                    },
+                    "referencetotransformerrootstackS3DeploymentBucket7592718ARef": {
+                        "Ref": "S3DeploymentBucket"
+                    },
+                    "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref": {
+                        "Ref": "S3DeploymentRootKey"
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundauth0FunctionQuerygetGameRoundauth0FunctionAppSyncFunction415FA646FunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundQuerygetGameRoundauth0FunctionQuerygetGameRoundauth0FunctionAppSyncFunction415FA646FunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundpostAuth0FunctionQuerygetGameRoundpostAuth0FunctionAppSyncFunction5077CAEDFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundQuerygetGameRoundpostAuth0FunctionQuerygetGameRoundpostAuth0FunctionAppSyncFunction5077CAEDFunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackauthRoleNameFB872D50Ref": {
+                        "Ref": "authRoleName"
+                    },
+                    "referencetotransformerrootstackunauthRoleName49F3C1FERef": {
+                        "Ref": "unauthRoleName"
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundMutationcreateGameRoundinit0FunctionMutationcreateGameRoundinit0FunctionAppSyncFunctionBA380DFFFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundMutationcreateGameRoundinit0FunctionMutationcreateGameRoundinit0FunctionAppSyncFunctionBA380DFFFunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundMutationcreateGameRoundauth0FunctionMutationcreateGameRoundauth0FunctionAppSyncFunctionABE5F250FunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundMutationcreateGameRoundauth0FunctionMutationcreateGameRoundauth0FunctionAppSyncFunctionABE5F250FunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundMutationupdateGameRoundinit0FunctionMutationupdateGameRoundinit0FunctionAppSyncFunctionB5A78DEBFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundMutationupdateGameRoundinit0FunctionMutationupdateGameRoundinit0FunctionAppSyncFunctionB5A78DEBFunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundSubscriptiononCreateGameRoundauth0FunctionSubscriptiononCreateGameRoundauth0FunctionAppSyncFunction42F0E2ADFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundSubscriptiononCreateGameRoundauth0FunctionSubscriptiononCreateGameRoundauth0FunctionAppSyncFunction42F0E2ADFunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundSubscriptionOnCreateGameRoundDataResolverFnSubscriptionOnCreateGameRoundDataResolverFnAppSyncFunction9784FAFFFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundSubscriptionOnCreateGameRoundDataResolverFnSubscriptionOnCreateGameRoundDataResolverFnAppSyncFunction9784FAFFFunctionId"
+                        ]
+                    }
+                }
+            },
+            "DependsOn": [
+                "GraphQLAPITransformerSchema3CB2AE18"
+            ]
+        },
+        "GameSession": {
+            "Type": "AWS::CloudFormation::Stack",
+            "Properties": {
+                "TemplateURL": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "https://s3.",
+                            {
+                                "Ref": "AWS::Region"
+                            },
+                            ".",
+                            {
+                                "Ref": "AWS::URLSuffix"
+                            },
+                            "/",
+                            {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "/",
+                            {
+                                "Ref": "S3DeploymentRootKey"
+                            },
+                            "/stacks/GameSession.json"
+                        ]
+                    ]
+                },
+                "Parameters": {
+                    "DynamoDBModelTableReadIOPS": {
+                        "Ref": "DynamoDBModelTableReadIOPS"
+                    },
+                    "DynamoDBModelTableWriteIOPS": {
+                        "Ref": "DynamoDBModelTableWriteIOPS"
+                    },
+                    "DynamoDBBillingMode": {
+                        "Ref": "DynamoDBBillingMode"
+                    },
+                    "DynamoDBEnablePointInTimeRecovery": {
+                        "Ref": "DynamoDBEnablePointInTimeRecovery"
+                    },
+                    "DynamoDBEnableServerSideEncryption": {
+                        "Ref": "DynamoDBEnableServerSideEncryption"
+                    },
+                    "referencetotransformerrootstackenv10C5A902Ref": {
+                        "Ref": "env"
+                    },
+                    "referencetotransformerrootstackGraphQLAPI20497F53ApiId": {
+                        "Fn::GetAtt": [
+                            "GraphQLAPI",
+                            "ApiId"
+                        ]
+                    },
+                    "referencetotransformerrootstackS3DeploymentBucket7592718ARef": {
+                        "Ref": "S3DeploymentBucket"
+                    },
+                    "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref": {
+                        "Ref": "S3DeploymentRootKey"
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundauth0FunctionQuerygetGameRoundauth0FunctionAppSyncFunction415FA646FunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundQuerygetGameRoundauth0FunctionQuerygetGameRoundauth0FunctionAppSyncFunction415FA646FunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundpostAuth0FunctionQuerygetGameRoundpostAuth0FunctionAppSyncFunction5077CAEDFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundQuerygetGameRoundpostAuth0FunctionQuerygetGameRoundpostAuth0FunctionAppSyncFunction5077CAEDFunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackauthRoleNameFB872D50Ref": {
+                        "Ref": "authRoleName"
+                    },
+                    "referencetotransformerrootstackunauthRoleName49F3C1FERef": {
+                        "Ref": "unauthRoleName"
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundMutationcreateGameRoundinit0FunctionMutationcreateGameRoundinit0FunctionAppSyncFunctionBA380DFFFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundMutationcreateGameRoundinit0FunctionMutationcreateGameRoundinit0FunctionAppSyncFunctionBA380DFFFunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundMutationcreateGameRoundauth0FunctionMutationcreateGameRoundauth0FunctionAppSyncFunctionABE5F250FunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundMutationcreateGameRoundauth0FunctionMutationcreateGameRoundauth0FunctionAppSyncFunctionABE5F250FunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundMutationupdateGameRoundinit0FunctionMutationupdateGameRoundinit0FunctionAppSyncFunctionB5A78DEBFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundMutationupdateGameRoundinit0FunctionMutationupdateGameRoundinit0FunctionAppSyncFunctionB5A78DEBFunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundSubscriptiononCreateGameRoundauth0FunctionSubscriptiononCreateGameRoundauth0FunctionAppSyncFunction42F0E2ADFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundSubscriptiononCreateGameRoundauth0FunctionSubscriptiononCreateGameRoundauth0FunctionAppSyncFunction42F0E2ADFunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundSubscriptionOnCreateGameRoundDataResolverFnSubscriptionOnCreateGameRoundDataResolverFnAppSyncFunction9784FAFFFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundSubscriptionOnCreateGameRoundDataResolverFnSubscriptionOnCreateGameRoundDataResolverFnAppSyncFunction9784FAFFFunctionId"
+                        ]
+                    }
+                }
+            },
+            "DependsOn": [
+                "GraphQLAPITransformerSchema3CB2AE18"
+            ]
+        },
+        "Lobby": {
+            "Type": "AWS::CloudFormation::Stack",
+            "Properties": {
+                "TemplateURL": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "https://s3.",
+                            {
+                                "Ref": "AWS::Region"
+                            },
+                            ".",
+                            {
+                                "Ref": "AWS::URLSuffix"
+                            },
+                            "/",
+                            {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "/",
+                            {
+                                "Ref": "S3DeploymentRootKey"
+                            },
+                            "/stacks/Lobby.json"
+                        ]
+                    ]
+                },
+                "Parameters": {
+                    "DynamoDBModelTableReadIOPS": {
+                        "Ref": "DynamoDBModelTableReadIOPS"
+                    },
+                    "DynamoDBModelTableWriteIOPS": {
+                        "Ref": "DynamoDBModelTableWriteIOPS"
+                    },
+                    "DynamoDBBillingMode": {
+                        "Ref": "DynamoDBBillingMode"
+                    },
+                    "DynamoDBEnablePointInTimeRecovery": {
+                        "Ref": "DynamoDBEnablePointInTimeRecovery"
+                    },
+                    "DynamoDBEnableServerSideEncryption": {
+                        "Ref": "DynamoDBEnableServerSideEncryption"
+                    },
+                    "referencetotransformerrootstackenv10C5A902Ref": {
+                        "Ref": "env"
+                    },
+                    "referencetotransformerrootstackGraphQLAPI20497F53ApiId": {
+                        "Fn::GetAtt": [
+                            "GraphQLAPI",
+                            "ApiId"
+                        ]
+                    },
+                    "referencetotransformerrootstackS3DeploymentBucket7592718ARef": {
+                        "Ref": "S3DeploymentBucket"
+                    },
+                    "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref": {
+                        "Ref": "S3DeploymentRootKey"
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundauth0FunctionQuerygetGameRoundauth0FunctionAppSyncFunction415FA646FunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundQuerygetGameRoundauth0FunctionQuerygetGameRoundauth0FunctionAppSyncFunction415FA646FunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundpostAuth0FunctionQuerygetGameRoundpostAuth0FunctionAppSyncFunction5077CAEDFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundQuerygetGameRoundpostAuth0FunctionQuerygetGameRoundpostAuth0FunctionAppSyncFunction5077CAEDFunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackauthRoleNameFB872D50Ref": {
+                        "Ref": "authRoleName"
+                    },
+                    "referencetotransformerrootstackunauthRoleName49F3C1FERef": {
+                        "Ref": "unauthRoleName"
+                    },
+                    "referencetotransformerrootstackGraphQLAPINONEDS2BA9D1C8Name": {
+                        "Fn::GetAtt": [
+                            "GraphQLAPINONEDS95A13CF0",
+                            "Name"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundMutationcreateGameRoundinit0FunctionMutationcreateGameRoundinit0FunctionAppSyncFunctionBA380DFFFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundMutationcreateGameRoundinit0FunctionMutationcreateGameRoundinit0FunctionAppSyncFunctionBA380DFFFunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundMutationcreateGameRoundauth0FunctionMutationcreateGameRoundauth0FunctionAppSyncFunctionABE5F250FunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundMutationcreateGameRoundauth0FunctionMutationcreateGameRoundauth0FunctionAppSyncFunctionABE5F250FunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundMutationupdateGameRoundinit0FunctionMutationupdateGameRoundinit0FunctionAppSyncFunctionB5A78DEBFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundMutationupdateGameRoundinit0FunctionMutationupdateGameRoundinit0FunctionAppSyncFunctionB5A78DEBFunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundSubscriptiononCreateGameRoundauth0FunctionSubscriptiononCreateGameRoundauth0FunctionAppSyncFunction42F0E2ADFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundSubscriptiononCreateGameRoundauth0FunctionSubscriptiononCreateGameRoundauth0FunctionAppSyncFunction42F0E2ADFunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundSubscriptionOnCreateGameRoundDataResolverFnSubscriptionOnCreateGameRoundDataResolverFnAppSyncFunction9784FAFFFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundSubscriptionOnCreateGameRoundDataResolverFnSubscriptionOnCreateGameRoundDataResolverFnAppSyncFunction9784FAFFFunctionId"
+                        ]
+                    }
+                }
+            },
+            "DependsOn": [
+                "GraphQLAPITransformerSchema3CB2AE18"
+            ]
+        },
+        "Question": {
+            "Type": "AWS::CloudFormation::Stack",
+            "Properties": {
+                "TemplateURL": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "https://s3.",
+                            {
+                                "Ref": "AWS::Region"
+                            },
+                            ".",
+                            {
+                                "Ref": "AWS::URLSuffix"
+                            },
+                            "/",
+                            {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "/",
+                            {
+                                "Ref": "S3DeploymentRootKey"
+                            },
+                            "/stacks/Question.json"
+                        ]
+                    ]
+                },
+                "Parameters": {
+                    "DynamoDBModelTableReadIOPS": {
+                        "Ref": "DynamoDBModelTableReadIOPS"
+                    },
+                    "DynamoDBModelTableWriteIOPS": {
+                        "Ref": "DynamoDBModelTableWriteIOPS"
+                    },
+                    "DynamoDBBillingMode": {
+                        "Ref": "DynamoDBBillingMode"
+                    },
+                    "DynamoDBEnablePointInTimeRecovery": {
+                        "Ref": "DynamoDBEnablePointInTimeRecovery"
+                    },
+                    "DynamoDBEnableServerSideEncryption": {
+                        "Ref": "DynamoDBEnableServerSideEncryption"
+                    },
+                    "referencetotransformerrootstackenv10C5A902Ref": {
+                        "Ref": "env"
+                    },
+                    "referencetotransformerrootstackGraphQLAPI20497F53ApiId": {
+                        "Fn::GetAtt": [
+                            "GraphQLAPI",
+                            "ApiId"
+                        ]
+                    }
+                }
+            }
+        },
+        "User": {
+            "Type": "AWS::CloudFormation::Stack",
+            "Properties": {
+                "TemplateURL": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "https://s3.",
+                            {
+                                "Ref": "AWS::Region"
+                            },
+                            ".",
+                            {
+                                "Ref": "AWS::URLSuffix"
+                            },
+                            "/",
+                            {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "/",
+                            {
+                                "Ref": "S3DeploymentRootKey"
+                            },
+                            "/stacks/User.json"
+                        ]
+                    ]
+                },
+                "Parameters": {
+                    "DynamoDBModelTableReadIOPS": {
+                        "Ref": "DynamoDBModelTableReadIOPS"
+                    },
+                    "DynamoDBModelTableWriteIOPS": {
+                        "Ref": "DynamoDBModelTableWriteIOPS"
+                    },
+                    "DynamoDBBillingMode": {
+                        "Ref": "DynamoDBBillingMode"
+                    },
+                    "DynamoDBEnablePointInTimeRecovery": {
+                        "Ref": "DynamoDBEnablePointInTimeRecovery"
+                    },
+                    "DynamoDBEnableServerSideEncryption": {
+                        "Ref": "DynamoDBEnableServerSideEncryption"
+                    },
+                    "referencetotransformerrootstackenv10C5A902Ref": {
+                        "Ref": "env"
+                    },
+                    "referencetotransformerrootstackGraphQLAPI20497F53ApiId": {
+                        "Fn::GetAtt": [
+                            "GraphQLAPI",
+                            "ApiId"
+                        ]
+                    },
+                    "referencetotransformerrootstackS3DeploymentBucket7592718ARef": {
+                        "Ref": "S3DeploymentBucket"
+                    },
+                    "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref": {
+                        "Ref": "S3DeploymentRootKey"
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundauth0FunctionQuerygetGameRoundauth0FunctionAppSyncFunction415FA646FunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundQuerygetGameRoundauth0FunctionQuerygetGameRoundauth0FunctionAppSyncFunction415FA646FunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundpostAuth0FunctionQuerygetGameRoundpostAuth0FunctionAppSyncFunction5077CAEDFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundQuerygetGameRoundpostAuth0FunctionQuerygetGameRoundpostAuth0FunctionAppSyncFunction5077CAEDFunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackauthRoleNameFB872D50Ref": {
+                        "Ref": "authRoleName"
+                    },
+                    "referencetotransformerrootstackunauthRoleName49F3C1FERef": {
+                        "Ref": "unauthRoleName"
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundMutationupdateGameRoundinit0FunctionMutationupdateGameRoundinit0FunctionAppSyncFunctionB5A78DEBFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundMutationupdateGameRoundinit0FunctionMutationupdateGameRoundinit0FunctionAppSyncFunctionB5A78DEBFunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundSubscriptiononCreateGameRoundauth0FunctionSubscriptiononCreateGameRoundauth0FunctionAppSyncFunction42F0E2ADFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundSubscriptiononCreateGameRoundauth0FunctionSubscriptiononCreateGameRoundauth0FunctionAppSyncFunction42F0E2ADFunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundSubscriptionOnCreateGameRoundDataResolverFnSubscriptionOnCreateGameRoundDataResolverFnAppSyncFunction9784FAFFFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundSubscriptionOnCreateGameRoundDataResolverFnSubscriptionOnCreateGameRoundDataResolverFnAppSyncFunction9784FAFFFunctionId"
+                        ]
+                    }
+                }
+            },
+            "DependsOn": [
+                "GraphQLAPITransformerSchema3CB2AE18"
+            ]
+        },
+        "Participant": {
+            "Type": "AWS::CloudFormation::Stack",
+            "Properties": {
+                "TemplateURL": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "https://s3.",
+                            {
+                                "Ref": "AWS::Region"
+                            },
+                            ".",
+                            {
+                                "Ref": "AWS::URLSuffix"
+                            },
+                            "/",
+                            {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "/",
+                            {
+                                "Ref": "S3DeploymentRootKey"
+                            },
+                            "/stacks/Participant.json"
+                        ]
+                    ]
+                },
+                "Parameters": {
+                    "DynamoDBModelTableReadIOPS": {
+                        "Ref": "DynamoDBModelTableReadIOPS"
+                    },
+                    "DynamoDBModelTableWriteIOPS": {
+                        "Ref": "DynamoDBModelTableWriteIOPS"
+                    },
+                    "DynamoDBBillingMode": {
+                        "Ref": "DynamoDBBillingMode"
+                    },
+                    "DynamoDBEnablePointInTimeRecovery": {
+                        "Ref": "DynamoDBEnablePointInTimeRecovery"
+                    },
+                    "DynamoDBEnableServerSideEncryption": {
+                        "Ref": "DynamoDBEnableServerSideEncryption"
+                    },
+                    "referencetotransformerrootstackenv10C5A902Ref": {
+                        "Ref": "env"
+                    },
+                    "referencetotransformerrootstackGraphQLAPI20497F53ApiId": {
+                        "Fn::GetAtt": [
+                            "GraphQLAPI",
+                            "ApiId"
+                        ]
+                    },
+                    "referencetotransformerrootstackS3DeploymentBucket7592718ARef": {
+                        "Ref": "S3DeploymentBucket"
+                    },
+                    "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref": {
+                        "Ref": "S3DeploymentRootKey"
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundauth0FunctionQuerygetGameRoundauth0FunctionAppSyncFunction415FA646FunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundQuerygetGameRoundauth0FunctionQuerygetGameRoundauth0FunctionAppSyncFunction415FA646FunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundpostAuth0FunctionQuerygetGameRoundpostAuth0FunctionAppSyncFunction5077CAEDFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundQuerygetGameRoundpostAuth0FunctionQuerygetGameRoundpostAuth0FunctionAppSyncFunction5077CAEDFunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackauthRoleNameFB872D50Ref": {
+                        "Ref": "authRoleName"
+                    },
+                    "referencetotransformerrootstackunauthRoleName49F3C1FERef": {
+                        "Ref": "unauthRoleName"
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundMutationcreateGameRoundinit0FunctionMutationcreateGameRoundinit0FunctionAppSyncFunctionBA380DFFFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundMutationcreateGameRoundinit0FunctionMutationcreateGameRoundinit0FunctionAppSyncFunctionBA380DFFFunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundMutationcreateGameRoundauth0FunctionMutationcreateGameRoundauth0FunctionAppSyncFunctionABE5F250FunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundMutationcreateGameRoundauth0FunctionMutationcreateGameRoundauth0FunctionAppSyncFunctionABE5F250FunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundMutationupdateGameRoundinit0FunctionMutationupdateGameRoundinit0FunctionAppSyncFunctionB5A78DEBFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundMutationupdateGameRoundinit0FunctionMutationupdateGameRoundinit0FunctionAppSyncFunctionB5A78DEBFunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundSubscriptiononCreateGameRoundauth0FunctionSubscriptiononCreateGameRoundauth0FunctionAppSyncFunction42F0E2ADFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundSubscriptiononCreateGameRoundauth0FunctionSubscriptiononCreateGameRoundauth0FunctionAppSyncFunction42F0E2ADFunctionId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundSubscriptionOnCreateGameRoundDataResolverFnSubscriptionOnCreateGameRoundDataResolverFnAppSyncFunction9784FAFFFunctionId": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundSubscriptionOnCreateGameRoundDataResolverFnSubscriptionOnCreateGameRoundDataResolverFnAppSyncFunction9784FAFFFunctionId"
+                        ]
+                    }
+                }
+            },
+            "DependsOn": [
+                "GraphQLAPITransformerSchema3CB2AE18"
+            ]
+        },
+        "ConnectionStack": {
+            "Type": "AWS::CloudFormation::Stack",
+            "Properties": {
+                "TemplateURL": {
+                    "Fn::Join": [
+                        "",
+                        [
+                            "https://s3.",
+                            {
+                                "Ref": "AWS::Region"
+                            },
+                            ".",
+                            {
+                                "Ref": "AWS::URLSuffix"
+                            },
+                            "/",
+                            {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            "/",
+                            {
+                                "Ref": "S3DeploymentRootKey"
+                            },
+                            "/stacks/ConnectionStack.json"
+                        ]
+                    ]
+                },
+                "Parameters": {
+                    "referencetotransformerrootstackGraphQLAPI20497F53ApiId": {
+                        "Fn::GetAtt": [
+                            "GraphQLAPI",
+                            "ApiId"
+                        ]
+                    },
+                    "referencetotransformerrootstackGraphQLAPINONEDS2BA9D1C8Name": {
+                        "Fn::GetAtt": [
+                            "GraphQLAPINONEDS95A13CF0",
+                            "Name"
+                        ]
+                    },
+                    "referencetotransformerrootstackS3DeploymentBucket7592718ARef": {
+                        "Ref": "S3DeploymentBucket"
+                    },
+                    "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref": {
+                        "Ref": "S3DeploymentRootKey"
+                    },
+                    "referencetotransformerrootstackSubmittedAnswerNestedStackSubmittedAnswerNestedStackResource328BA409OutputstransformerrootstackSubmittedAnswerSubmittedAnswerDataSource0E9B845DName": {
+                        "Fn::GetAtt": [
+                            "SubmittedAnswer",
+                            "Outputs.transformerrootstackSubmittedAnswerSubmittedAnswerDataSource0E9B845DName"
+                        ]
+                    },
+                    "referencetotransformerrootstackSubmittedAnswerNestedStackSubmittedAnswerNestedStackResource328BA409OutputstransformerrootstackSubmittedAnswerSubmittedAnswerTableD8612393Ref": {
+                        "Fn::GetAtt": [
+                            "SubmittedAnswer",
+                            "Outputs.transformerrootstackSubmittedAnswerSubmittedAnswerTableD8612393Ref"
+                        ]
+                    },
+                    "referencetotransformerrootstackauthRoleNameFB872D50Ref": {
+                        "Ref": "authRoleName"
+                    },
+                    "referencetotransformerrootstackunauthRoleName49F3C1FERef": {
+                        "Ref": "unauthRoleName"
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundGameRoundDataSourceB6282CC8Name": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundGameRoundDataSourceB6282CC8Name"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundGameRoundTable78F6ADE6Ref": {
+                        "Fn::GetAtt": [
+                            "GameRound",
+                            "Outputs.transformerrootstackGameRoundGameRoundTable78F6ADE6Ref"
+                        ]
+                    },
+                    "referencetotransformerrootstackLobbyNestedStackLobbyNestedStackResource32FEB838OutputstransformerrootstackLobbyLobbyDataSourceABAC22C2Name": {
+                        "Fn::GetAtt": [
+                            "Lobby",
+                            "Outputs.transformerrootstackLobbyLobbyDataSourceABAC22C2Name"
+                        ]
+                    },
+                    "referencetotransformerrootstackLobbyNestedStackLobbyNestedStackResource32FEB838OutputstransformerrootstackLobbyLobbyTableCDC796D6Ref": {
+                        "Fn::GetAtt": [
+                            "Lobby",
+                            "Outputs.transformerrootstackLobbyLobbyTableCDC796D6Ref"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameSessionNestedStackGameSessionNestedStackResource31684217OutputstransformerrootstackGameSessionGameSessionDataSource3CB1B2E4Name": {
+                        "Fn::GetAtt": [
+                            "GameSession",
+                            "Outputs.transformerrootstackGameSessionGameSessionDataSource3CB1B2E4Name"
+                        ]
+                    },
+                    "referencetotransformerrootstackGameSessionNestedStackGameSessionNestedStackResource31684217OutputstransformerrootstackGameSessionGameSessionTableD04C466FRef": {
+                        "Fn::GetAtt": [
+                            "GameSession",
+                            "Outputs.transformerrootstackGameSessionGameSessionTableD04C466FRef"
+                        ]
+                    },
+                    "referencetotransformerrootstackUserNestedStackUserNestedStackResource01084C14OutputstransformerrootstackUserUserDataSourceA8C4C398Name": {
+                        "Fn::GetAtt": [
+                            "User",
+                            "Outputs.transformerrootstackUserUserDataSourceA8C4C398Name"
+                        ]
+                    },
+                    "referencetotransformerrootstackUserNestedStackUserNestedStackResource01084C14OutputstransformerrootstackUserUserTableA7A02430Ref": {
+                        "Fn::GetAtt": [
+                            "User",
+                            "Outputs.transformerrootstackUserUserTableA7A02430Ref"
+                        ]
+                    },
+                    "referencetotransformerrootstackParticipantNestedStackParticipantNestedStackResourceB2CF3CE6OutputstransformerrootstackParticipantParticipantDataSource7E7D4C1DName": {
+                        "Fn::GetAtt": [
+                            "Participant",
+                            "Outputs.transformerrootstackParticipantParticipantDataSource7E7D4C1DName"
+                        ]
+                    },
+                    "referencetotransformerrootstackParticipantNestedStackParticipantNestedStackResourceB2CF3CE6OutputstransformerrootstackParticipantParticipantTableBB843A94Ref": {
+                        "Fn::GetAtt": [
+                            "Participant",
+                            "Outputs.transformerrootstackParticipantParticipantTableBB843A94Ref"
+                        ]
+                    }
+                }
+            },
+            "DependsOn": [
+                "GameRound",
+                "GameSession",
+                "GraphQLAPITransformerSchema3CB2AE18",
+                "Lobby",
+                "Participant",
+                "SubmittedAnswer",
+                "User"
+            ]
+        },
+        "CustomResourcesjson": {
+            "Type": "AWS::CloudFormation::Stack",
+            "Properties": {
+                "Parameters": {
+                    "AppSyncApiId": {
+                        "Fn::GetAtt": [
+                            "GraphQLAPI",
+                            "ApiId"
+                        ]
+                    },
+                    "AppSyncApiName": {
+                        "Ref": "AppSyncApiName"
+                    },
+                    "env": {
+                        "Ref": "env"
+                    },
+                    "S3DeploymentBucket": {
+                        "Ref": "S3DeploymentBucket"
+                    },
+                    "S3DeploymentRootKey": {
+                        "Ref": "S3DeploymentRootKey"
+                    }
+                },
+                "TemplateURL": {
+                    "Fn::Join": [
+                        "/",
+                        [
+                            "https://s3.amazonaws.com",
+                            {
+                                "Ref": "S3DeploymentBucket"
+                            },
+                            {
+                                "Ref": "S3DeploymentRootKey"
+                            },
+                            "stacks",
+                            "CustomResources.json"
+                        ]
+                    ]
+                }
+            },
+            "DependsOn": [
+                "GraphQLAPI",
+                "GraphQLAPITransformerSchema3CB2AE18",
+                "GameRound",
+                "SubmittedAnswer",
+                "GameSession",
+                "Lobby",
+                "Question",
+                "User",
+                "Participant",
+                "ConnectionStack"
+            ]
+        }
+    },
+    "Outputs": {
+        "GraphQLAPIKeyOutput": {
+            "Description": "Your GraphQL API ID.",
+            "Value": {
+                "Fn::GetAtt": [
+                    "GraphQLAPIDefaultApiKey215A6DD7",
+                    "ApiKey"
+                ]
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Join": [
+                        ":",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "GraphQLApiKey"
+                        ]
+                    ]
+                }
+            }
+        },
+        "GraphQLAPIIdOutput": {
+            "Description": "Your GraphQL API ID.",
+            "Value": {
+                "Fn::GetAtt": [
+                    "GraphQLAPI",
+                    "ApiId"
+                ]
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Join": [
+                        ":",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "GraphQLApiId"
+                        ]
+                    ]
+                }
+            }
+        },
+        "GraphQLAPIEndpointOutput": {
+            "Description": "Your GraphQL API endpoint.",
+            "Value": {
+                "Fn::GetAtt": [
+                    "GraphQLAPI",
+                    "GraphQLUrl"
+                ]
+            },
+            "Export": {
+                "Name": {
+                    "Fn::Join": [
+                        ":",
+                        [
+                            {
+                                "Ref": "AWS::StackName"
+                            },
+                            "GraphQLApiEndpoint"
+                        ]
+                    ]
+                }
+            }
+        }
+    }
+}

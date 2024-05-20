@@ -1,0 +1,173 @@
+{
+  "Description": "{\"createdOn\":\"Mac\",\"createdBy\":\"Amplify\",\"createdWith\":\"12.10.1\",\"stackType\":\"auth-Cognito-UserPool-Groups\",\"metadata\":{}}",
+  "AWSTemplateFormatVersion": "2010-09-09",
+  "Parameters": {
+    "env": {
+      "Type": "String"
+    },
+    "AuthRoleArn": {
+      "Type": "String"
+    },
+    "UnauthRoleArn": {
+      "Type": "String"
+    },
+    "authDeenDownAuthUserPoolId": {
+      "Type": "String",
+      "Default": "authDeenDownAuthUserPoolId"
+    },
+    "authDeenDownAuthIdentityPoolId": {
+      "Type": "String",
+      "Default": "authDeenDownAuthIdentityPoolId"
+    },
+    "authDeenDownAuthAppClientID": {
+      "Type": "String",
+      "Default": "authDeenDownAuthAppClientID"
+    },
+    "authDeenDownAuthAppClientIDWeb": {
+      "Type": "String",
+      "Default": "authDeenDownAuthAppClientIDWeb"
+    }
+  },
+  "Conditions": {
+    "ShouldNotCreateEnvResources": {
+      "Fn::Equals": [
+        {
+          "Ref": "env"
+        },
+        "NONE"
+      ]
+    }
+  },
+  "Resources": {
+    "PlayersGroup": {
+      "Type": "AWS::Cognito::UserPoolGroup",
+      "Properties": {
+        "UserPoolId": {
+          "Ref": "authDeenDownAuthUserPoolId"
+        },
+        "Description": "override success",
+        "GroupName": "Players",
+        "Precedence": 1,
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "PlayersGroupRole",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "PlayersGroupRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": "cognito-identity.amazonaws.com"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "cognito-identity.amazonaws.com:aud": {
+                    "Ref": "authDeenDownAuthIdentityPoolId"
+                  }
+                },
+                "ForAnyValue:StringLike": {
+                  "cognito-identity.amazonaws.com:amr": "authenticated"
+                }
+              }
+            }
+          ]
+        },
+        "RoleName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "authDeenDownAuthUserPoolId"
+              },
+              "-PlayersGroupRole"
+            ]
+          ]
+        }
+      }
+    },
+    "AdminsGroup": {
+      "Type": "AWS::Cognito::UserPoolGroup",
+      "Properties": {
+        "UserPoolId": {
+          "Ref": "authDeenDownAuthUserPoolId"
+        },
+        "Description": "override success",
+        "GroupName": "Admins",
+        "Precedence": 2,
+        "RoleArn": {
+          "Fn::GetAtt": [
+            "AdminsGroupRole",
+            "Arn"
+          ]
+        }
+      }
+    },
+    "AdminsGroupRole": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Version": "2012-10-17",
+          "Statement": [
+            {
+              "Sid": "",
+              "Effect": "Allow",
+              "Principal": {
+                "Federated": "cognito-identity.amazonaws.com"
+              },
+              "Action": "sts:AssumeRoleWithWebIdentity",
+              "Condition": {
+                "StringEquals": {
+                  "cognito-identity.amazonaws.com:aud": {
+                    "Ref": "authDeenDownAuthIdentityPoolId"
+                  }
+                },
+                "ForAnyValue:StringLike": {
+                  "cognito-identity.amazonaws.com:amr": "authenticated"
+                }
+              }
+            }
+          ]
+        },
+        "RoleName": {
+          "Fn::Join": [
+            "",
+            [
+              {
+                "Ref": "authDeenDownAuthUserPoolId"
+              },
+              "-AdminsGroupRole"
+            ]
+          ]
+        }
+      }
+    }
+  },
+  "Outputs": {
+    "PlayersGroupRole": {
+      "Value": {
+        "Fn::GetAtt": [
+          "PlayersGroupRole",
+          "Arn"
+        ]
+      }
+    },
+    "AdminsGroupRole": {
+      "Value": {
+        "Fn::GetAtt": [
+          "AdminsGroupRole",
+          "Arn"
+        ]
+      }
+    }
+  }
+}

@@ -1,0 +1,31 @@
+{
+	"version": "1",
+	"region": "ca-central-1",
+	"userPoolId": "ca-central-1_xbHQ8ebi3",
+	"userName": "ee304874-8393-4701-a4ac-01785985e7a3",
+	"callerContext": {
+		"awsSdkVersion": "aws-sdk-unknown-unknown",
+		"clientId": "4dhanlfjf4bb1e9mf5q4e0ipcm"
+	},
+	"triggerSource": "CustomMessage_SignUp",
+	"request": {
+		"userAttributes": {
+			"cognito:user_status": "CONFIRMED",
+			"cognito:email_alias": "mohd@mohd.ca",
+			"custom:user_type": "CUSTOMER",
+			"email": "mohd@mohd.ca",
+			"email_verified": "true",
+			"family_name": "Mohamed",
+			"given_name": "Mohamed",
+			"sub": "fd8bed41-06ae-43fb-ad5d-e145b94b0a65"
+		},
+		"codeParameter": "{####}",
+		"linkParameter": "{##Click Here##}",
+		"usernameParameter": null
+	},
+	"response": {
+		"smsMessage": "🔒 {####} is your Advice verification code.",
+		"emailMessage": "Here's your Advice confirmation code: {####}. Not able to enter your code? Copy and paste the following link into your favourite browser:",
+		"emailSubject": "📧 Verify your email address"
+	}
+}

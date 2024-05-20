@@ -1,0 +1,14 @@
+{
+	"trigger": true,
+	"modules": ["custom"],
+	"parentResource": "DeenDownAuth",
+	"functionName": "DeenDownAuthPreAuthentication",
+	"resourceName": "DeenDownAuthPreAuthentication",
+	"parentStack": "auth",
+	"triggerEnvs": "[]",
+	"triggerDir": "/snapshot/amplify-cli/build/node_modules/@aws-amplify/amplify-category-auth/provider-utils/awscloudformation/triggers/PreAuthentication",
+	"triggerTemplate": "PreAuthentication.json.ejs",
+	"triggerEventPath": "PreAuthentication.event.json",
+	"roleName": "DeenDownAuthPreAuthentication",
+	"skipEdit": true
+}

@@ -1,0 +1,14 @@
+{
+	"trigger": true,
+	"modules": ["custom"],
+	"parentResource": "DeenDownAuth",
+	"functionName": "DeenDownAuthPostAuthentication",
+	"resourceName": "DeenDownAuthPostAuthentication",
+	"parentStack": "auth",
+	"triggerEnvs": "[]",
+	"triggerDir": "/snapshot/amplify-cli/build/node_modules/@aws-amplify/amplify-category-auth/provider-utils/awscloudformation/triggers/PostAuthentication",
+	"triggerTemplate": "PostAuthentication.json.ejs",
+	"triggerEventPath": "PostAuthentication.event.json",
+	"roleName": "DeenDownAuthPostAuthentication",
+	"skipEdit": true
+}

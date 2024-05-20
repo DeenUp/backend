@@ -1,0 +1,15 @@
+{
+	"request": {
+		"userAttributes": {
+			"cognito:user_status": "CONFIRMED",
+			"cognito:email_alias": "mohd@mohd.ca",
+			"custom:user_type": "CUSTOMER",
+			"email": "mohd@mohd.ca",
+			"email_verified": "true",
+			"family_name": "Mohamed",
+			"given_name": "Mohamed",
+			"sub": "fd8bed41-06ae-43fb-ad5d-e145b94b0a65"
+		}
+	},
+	"response": {}
+}

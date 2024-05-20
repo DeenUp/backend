@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["index.ts"],
+  "sourcesContent": ["import type { Event } from \"./event\"\n\nexport const handler = async (event: Event): Promise<Event> => {\n\tawait Promise.all([])\n\n\treturn event\n}\n"],
+  "mappings": "yaAAA,IAAAA,EAAA,GAAAC,EAAAD,EAAA,aAAAE,IAAA,eAAAC,EAAAH,GAEO,IAAME,EAAU,MAAOE,IAC7B,MAAM,QAAQ,IAAI,CAAC,CAAC,EAEbA",
+  "names": ["src_exports", "__export", "handler", "__toCommonJS", "event"]
+}

@@ -1,0 +1,28 @@
+{
+	"trigger": true,
+	"modules": ["add-to-group"],
+	"parentResource": "DeenDownAuth",
+	"functionName": "DeenDownAuthPostConfirmation",
+	"resourceName": "DeenDownAuthPostConfirmation",
+	"parentStack": "auth",
+	"triggerEnvs": "[]",
+	"triggerDir": "/snapshot/amplify-cli/build/node_modules/@aws-amplify/amplify-category-auth/provider-utils/awscloudformation/triggers/PostConfirmation",
+	"triggerTemplate": "PostConfirmation.json.ejs",
+	"triggerEventPath": "PostConfirmation.event.json",
+	"roleName": "DeenDownAuthPostConfirmation",
+	"skipEdit": true,
+	"permissions": {
+		"storage": {
+			"User:@model(appsync)": ["create"]
+		}
+	},
+	"lambdaLayers": [
+		{
+			"type": "ProjectLayer",
+			"resourceName": "deendownCommonLayerTs",
+			"env": "dev",
+			"version": "Always choose latest version",
+			"isLatestVersionSelected": true
+		}
+	]
+}

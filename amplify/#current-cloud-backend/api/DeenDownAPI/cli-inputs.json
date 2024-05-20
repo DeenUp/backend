@@ -1,0 +1,22 @@
+{
+	"version": 1,
+	"serviceConfiguration": {
+		"apiName": "DeenDownAPI",
+		"serviceName": "AppSync",
+		"defaultAuthType": {
+			"mode": "AMAZON_COGNITO_USER_POOLS",
+			"cognitoUserPoolId": "authDeenDownAuth"
+		},
+		"additionalAuthTypes": [
+			{
+				"mode": "API_KEY",
+				"expirationTime": 365,
+				"apiKeyExpirationDate": "2025-03-17T15:49:19.477Z",
+				"keyDescription": ""
+			},
+			{
+				"mode": "AWS_IAM"
+			}
+		]
+	}
+}

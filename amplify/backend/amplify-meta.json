@@ -1,0 +1,374 @@
+{
+  "providers": {
+    "awscloudformation": {
+      "AuthRoleName": "amplify-deendown-dev-145459-authRole",
+      "UnauthRoleArn": "arn:aws:iam::690314499321:role/amplify-deendown-dev-145459-unauthRole",
+      "AuthRoleArn": "arn:aws:iam::690314499321:role/amplify-deendown-dev-145459-authRole",
+      "Region": "ca-central-1",
+      "DeploymentBucketName": "amplify-deendown-dev-145459-deployment",
+      "UnauthRoleName": "amplify-deendown-dev-145459-unauthRole",
+      "StackName": "amplify-deendown-dev-145459",
+      "StackId": "arn:aws:cloudformation:ca-central-1:690314499321:stack/amplify-deendown-dev-145459/54d736f0-e46e-11ee-bc25-02883c127241",
+      "AmplifyAppId": "d142s443tjgton",
+      "AuthTriggerTemplateURL": "https://s3.amazonaws.com/amplify-deendown-dev-145459-deployment/amplify-cfn-templates/auth/auth-trigger-cloudformation-template.json"
+    }
+  },
+  "api": {
+    "AdminQueries": {
+      "authorizationType": "AMAZON_COGNITO_USER_POOLS",
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "DeenDownAuth"
+        },
+        {
+          "attributes": [
+            "Arn",
+            "Name"
+          ],
+          "category": "function",
+          "resourceName": "AdminQueriesd82aff64"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "API Gateway",
+      "output": {
+        "ApiName": "AdminQueries",
+        "RootUrl": "https://kgcs2epctj.execute-api.ca-central-1.amazonaws.com/dev",
+        "ApiId": "kgcs2epctj"
+      },
+      "lastPushTimeStamp": "2024-04-19T16:05:35.390Z",
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-deendown-dev-145459-deployment/amplify-cfn-templates/api/AdminQueries-cloudformation-template.json",
+        "logicalId": "apiAdminQueries"
+      }
+    },
+    "DeenDownAPI": {
+      "dependsOn": [
+        {
+          "attributes": [
+            "UserPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "DeenDownAuth"
+        }
+      ],
+      "output": {
+        "authConfig": {
+          "additionalAuthenticationProviders": [
+            {
+              "apiKeyConfig": {
+                "apiKeyExpirationDate": "2025-03-17T15:49:19.477Z",
+                "apiKeyExpirationDays": 365,
+                "description": ""
+              },
+              "authenticationType": "API_KEY"
+            },
+            {
+              "authenticationType": "AWS_IAM"
+            }
+          ],
+          "defaultAuthentication": {
+            "authenticationType": "AMAZON_COGNITO_USER_POOLS",
+            "userPoolConfig": {
+              "userPoolId": "authDeenDownAuth"
+            }
+          }
+        },
+        "GraphQLAPIIdOutput": "cbbcuakqvzc2feqh2e5avre2iu",
+        "GraphQLAPIEndpointOutput": "https://v3wqp7einnfnxahafz2uiub5gu.appsync-api.ca-central-1.amazonaws.com/graphql",
+        "GraphQLAPIKeyOutput": "da2-o4frvryzencwdeafik5nz22bku"
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "AppSync",
+      "lastPushTimeStamp": "2024-04-19T16:05:35.393Z",
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-deendown-dev-145459-deployment/amplify-cfn-templates/api/cloudformation-template.json",
+        "logicalId": "apiDeenDownAPI"
+      }
+    }
+  },
+  "auth": {
+    "DeenDownAuth": {
+      "customAuth": false,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Arn",
+            "Name"
+          ],
+          "category": "function",
+          "resourceName": "DeenDownAuthCustomMessage",
+          "triggerProvider": "Cognito"
+        },
+        {
+          "attributes": [
+            "Arn",
+            "Name"
+          ],
+          "category": "function",
+          "resourceName": "DeenDownAuthPostAuthentication",
+          "triggerProvider": "Cognito"
+        },
+        {
+          "attributes": [
+            "Arn",
+            "Name"
+          ],
+          "category": "function",
+          "resourceName": "DeenDownAuthPostConfirmation",
+          "triggerProvider": "Cognito"
+        },
+        {
+          "attributes": [
+            "Arn",
+            "Name"
+          ],
+          "category": "function",
+          "resourceName": "DeenDownAuthPreAuthentication",
+          "triggerProvider": "Cognito"
+        },
+        {
+          "attributes": [
+            "Arn",
+            "Name"
+          ],
+          "category": "function",
+          "resourceName": "DeenDownAuthPreSignup",
+          "triggerProvider": "Cognito"
+        }
+      ],
+      "frontendAuthConfig": {
+        "mfaConfiguration": "OPTIONAL",
+        "mfaTypes": [
+          "SMS",
+          "TOTP"
+        ],
+        "passwordProtectionSettings": {
+          "passwordPolicyMinLength": 8,
+          "passwordPolicyCharacters": [
+            "REQUIRES_LOWERCASE",
+            "REQUIRES_UPPERCASE"
+          ]
+        },
+        "signupAttributes": [
+          "EMAIL",
+          "NAME"
+        ],
+        "socialProviders": [
+          "FACEBOOK",
+          "GOOGLE"
+        ],
+        "usernameAttributes": [
+          "EMAIL",
+          "PHONE_NUMBER"
+        ],
+        "verificationMechanisms": [
+          "EMAIL"
+        ]
+      },
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito",
+      "output": {
+        "GoogleWebClient": "123",
+        "CreatedSNSRole": "arn:aws:iam::690314499321:role/snsffb2cd00145459-dev",
+        "UserPoolId": "ca-central-1_ll0YdbSLi",
+        "AppClientIDWeb": "716rf66mrl6sdu6gjv5rmj2s2v",
+        "AppClientID": "6mi2tc9q1mo5as87i73k4jju8",
+        "HostedUIDomain": "deenup-dev",
+        "FacebookWebClient": "123",
+        "IdentityPoolId": "ca-central-1:d9dd0a89-13cb-42fa-852b-c4325fc26665",
+        "UserPoolArn": "arn:aws:cognito-idp:ca-central-1:690314499321:userpool/ca-central-1_ll0YdbSLi",
+        "IdentityPoolName": "deendown_identitypool__dev",
+        "OAuthMetadata": "{\"AllowedOAuthFlows\":[\"code\"],\"AllowedOAuthScopes\":[\"phone\",\"email\",\"openid\",\"profile\",\"aws.cognito.signin.user.admin\"],\"CallbackURLs\":[\"http://localhost:3000/\",\"myapp://\",\"https://deenup.app/\"],\"LogoutURLs\":[\"http://localhost:3000/\",\"myapp://\",\"https://deenup.app/\"]}",
+        "UserPoolName": "deendown_userpool"
+      },
+      "lastPushTimeStamp": "2024-04-19T16:05:35.395Z",
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-deendown-dev-145459-deployment/amplify-cfn-templates/auth/DeenDownAuth-cloudformation-template.json",
+        "logicalId": "authDeenDownAuth"
+      }
+    },
+    "userPoolGroups": {
+      "dependsOn": [
+        {
+          "category": "auth",
+          "resourceName": "DeenDownAuth",
+          "attributes": [
+            "UserPoolId",
+            "AppClientIDWeb",
+            "AppClientID",
+            "IdentityPoolId"
+          ]
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Cognito-UserPool-Groups",
+      "output": {
+        "PlayersGroupRole": "arn:aws:iam::690314499321:role/ca-central-1_ll0YdbSLi-PlayersGroupRole",
+        "AdminsGroupRole": "arn:aws:iam::690314499321:role/ca-central-1_ll0YdbSLi-AdminsGroupRole"
+      },
+      "lastPushTimeStamp": "2024-04-19T16:05:38.145Z",
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-deendown-dev-145459-deployment/amplify-cfn-templates/auth/userPoolGroups-cloudformation-template.json",
+        "logicalId": "authuserPoolGroups"
+      }
+    }
+  },
+  "function": {
+    "AdminQueriesd82aff64": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "deendownCommonLayerTs"
+        },
+        {
+          "attributes": [
+            "UserPoolId"
+          ],
+          "category": "auth",
+          "resourceName": "DeenDownAuth"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "output": {
+        "LambdaExecutionRoleArn": "arn:aws:iam::690314499321:role/AdminQueriesd82aff64LambdaRole-dev",
+        "Region": "ca-central-1",
+        "Arn": "arn:aws:lambda:ca-central-1:690314499321:function:AdminQueriesd82aff64-dev",
+        "Name": "AdminQueriesd82aff64-dev",
+        "LambdaExecutionRole": "AdminQueriesd82aff64LambdaRole-dev"
+      },
+      "lastPushTimeStamp": "2024-04-19T16:05:35.399Z",
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-deendown-dev-145459-deployment/amplify-cfn-templates/function/AdminQueriesd82aff64-cloudformation-template.json",
+        "logicalId": "functionAdminQueriesd82aff64"
+      }
+    },
+    "DeenDownAuthCustomMessage": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "output": {
+        "LambdaExecutionRoleArn": "arn:aws:iam::690314499321:role/DeenDownAuthCustomMessage-dev",
+        "Region": "ca-central-1",
+        "Arn": "arn:aws:lambda:ca-central-1:690314499321:function:DeenDownAuthCustomMessage-dev",
+        "Name": "DeenDownAuthCustomMessage-dev",
+        "LambdaExecutionRole": "DeenDownAuthCustomMessage-dev"
+      },
+      "lastPushTimeStamp": "2024-04-19T16:05:35.401Z",
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-deendown-dev-145459-deployment/amplify-cfn-templates/function/DeenDownAuthCustomMessage-cloudformation-template.json",
+        "logicalId": "functionDeenDownAuthCustomMessage"
+      }
+    },
+    "DeenDownAuthPostAuthentication": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "output": {
+        "LambdaExecutionRoleArn": "arn:aws:iam::690314499321:role/DeenDownAuthPostAuthentication-dev",
+        "Region": "ca-central-1",
+        "Arn": "arn:aws:lambda:ca-central-1:690314499321:function:DeenDownAuthPostAuthentication-dev",
+        "Name": "DeenDownAuthPostAuthentication-dev",
+        "LambdaExecutionRole": "DeenDownAuthPostAuthentication-dev"
+      },
+      "lastPushTimeStamp": "2024-04-19T16:05:35.403Z",
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-deendown-dev-145459-deployment/amplify-cfn-templates/function/DeenDownAuthPostAuthentication-cloudformation-template.json",
+        "logicalId": "functionDeenDownAuthPostAuthentication"
+      }
+    },
+    "DeenDownAuthPostConfirmation": {
+      "build": true,
+      "dependsOn": [
+        {
+          "attributes": [
+            "Arn"
+          ],
+          "category": "function",
+          "resourceName": "deendownCommonLayerTs"
+        },
+        {
+          "attributes": [
+            "GraphQLAPIIdOutput"
+          ],
+          "category": "api",
+          "resourceName": "DeenDownAPI"
+        }
+      ],
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "output": {
+        "LambdaExecutionRoleArn": "arn:aws:iam::690314499321:role/DeenDownAuthPostConfirmation-dev",
+        "Region": "ca-central-1",
+        "Arn": "arn:aws:lambda:ca-central-1:690314499321:function:DeenDownAuthPostConfirmation-dev",
+        "Name": "DeenDownAuthPostConfirmation-dev",
+        "LambdaExecutionRole": "DeenDownAuthPostConfirmation-dev"
+      },
+      "lastPushTimeStamp": "2024-04-19T16:05:35.405Z",
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-deendown-dev-145459-deployment/amplify-cfn-templates/function/DeenDownAuthPostConfirmation-cloudformation-template.json",
+        "logicalId": "functionDeenDownAuthPostConfirmation"
+      }
+    },
+    "DeenDownAuthPreAuthentication": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "output": {
+        "LambdaExecutionRoleArn": "arn:aws:iam::690314499321:role/DeenDownAuthPreAuthentication-dev",
+        "Region": "ca-central-1",
+        "Arn": "arn:aws:lambda:ca-central-1:690314499321:function:DeenDownAuthPreAuthentication-dev",
+        "Name": "DeenDownAuthPreAuthentication-dev",
+        "LambdaExecutionRole": "DeenDownAuthPreAuthentication-dev"
+      },
+      "lastPushTimeStamp": "2024-04-19T16:05:35.407Z",
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-deendown-dev-145459-deployment/amplify-cfn-templates/function/DeenDownAuthPreAuthentication-cloudformation-template.json",
+        "logicalId": "functionDeenDownAuthPreAuthentication"
+      }
+    },
+    "DeenDownAuthPreSignup": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "Lambda",
+      "output": {
+        "LambdaExecutionRoleArn": "arn:aws:iam::690314499321:role/DeenDownAuthPreSignup-dev",
+        "Region": "ca-central-1",
+        "Arn": "arn:aws:lambda:ca-central-1:690314499321:function:DeenDownAuthPreSignup-dev",
+        "Name": "DeenDownAuthPreSignup-dev",
+        "LambdaExecutionRole": "DeenDownAuthPreSignup-dev"
+      },
+      "lastPushTimeStamp": "2024-04-19T16:05:35.409Z",
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-deendown-dev-145459-deployment/amplify-cfn-templates/function/DeenDownAuthPreSignup-cloudformation-template.json",
+        "logicalId": "functionDeenDownAuthPreSignup"
+      }
+    },
+    "deendownCommonLayerTs": {
+      "build": true,
+      "providerPlugin": "awscloudformation",
+      "service": "LambdaLayer",
+      "output": {
+        "Arn": "arn:aws:lambda:ca-central-1:690314499321:layer:deendownCommonLayerTs-dev:3"
+      },
+      "lastPushTimeStamp": "2024-04-19T16:05:35.411Z",
+      "providerMetadata": {
+        "s3TemplateURL": "https://s3.amazonaws.com/amplify-deendown-dev-145459-deployment/amplify-cfn-templates/function/deendownCommonLayerTs-awscloudformation-template.json",
+        "logicalId": "functiondeendownCommonLayerTs"
+      },
+      "s3Bucket": {
+        "deploymentBucketName": "amplify-deendown-dev-145459-deployment",
+        "s3Key": "amplify-builds/deendownCommonLayerTs-LambdaLayerVersionf8d3691b-build.zip"
+      }
+    }
+  }
+}

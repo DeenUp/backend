@@ -1,0 +1,1585 @@
+{
+  "Parameters": {
+    "DynamoDBModelTableReadIOPS": {
+      "Type": "Number",
+      "Default": 5,
+      "Description": "The number of read IOPS the table should support."
+    },
+    "DynamoDBModelTableWriteIOPS": {
+      "Type": "Number",
+      "Default": 5,
+      "Description": "The number of write IOPS the table should support."
+    },
+    "DynamoDBBillingMode": {
+      "Type": "String",
+      "Default": "PAY_PER_REQUEST",
+      "AllowedValues": [
+        "PAY_PER_REQUEST",
+        "PROVISIONED"
+      ],
+      "Description": "Configure @model types to create DynamoDB tables with PAY_PER_REQUEST or PROVISIONED billing modes."
+    },
+    "DynamoDBEnablePointInTimeRecovery": {
+      "Type": "String",
+      "Default": "false",
+      "AllowedValues": [
+        "true",
+        "false"
+      ],
+      "Description": "Whether to enable Point in Time Recovery on the table."
+    },
+    "DynamoDBEnableServerSideEncryption": {
+      "Type": "String",
+      "Default": "true",
+      "AllowedValues": [
+        "true",
+        "false"
+      ],
+      "Description": "Enable server side encryption powered by KMS."
+    },
+    "referencetotransformerrootstackenv10C5A902Ref": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackGraphQLAPI20497F53ApiId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackS3DeploymentBucket7592718ARef": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundauth0FunctionQuerygetGameRoundauth0FunctionAppSyncFunction415FA646FunctionId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundpostAuth0FunctionQuerygetGameRoundpostAuth0FunctionAppSyncFunction5077CAEDFunctionId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackauthRoleNameFB872D50Ref": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackunauthRoleName49F3C1FERef": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundMutationcreateGameRoundinit0FunctionMutationcreateGameRoundinit0FunctionAppSyncFunctionBA380DFFFunctionId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundMutationcreateGameRoundauth0FunctionMutationcreateGameRoundauth0FunctionAppSyncFunctionABE5F250FunctionId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundMutationupdateGameRoundinit0FunctionMutationupdateGameRoundinit0FunctionAppSyncFunctionB5A78DEBFunctionId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundSubscriptiononCreateGameRoundauth0FunctionSubscriptiononCreateGameRoundauth0FunctionAppSyncFunction42F0E2ADFunctionId": {
+      "Type": "String"
+    },
+    "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundSubscriptionOnCreateGameRoundDataResolverFnSubscriptionOnCreateGameRoundDataResolverFnAppSyncFunction9784FAFFFunctionId": {
+      "Type": "String"
+    }
+  },
+  "Conditions": {
+    "HasEnvironmentParameter": {
+      "Fn::Not": [
+        {
+          "Fn::Equals": [
+            {
+              "Ref": "referencetotransformerrootstackenv10C5A902Ref"
+            },
+            "NONE"
+          ]
+        }
+      ]
+    },
+    "ShouldUseServerSideEncryption": {
+      "Fn::Equals": [
+        {
+          "Ref": "DynamoDBEnableServerSideEncryption"
+        },
+        "true"
+      ]
+    },
+    "ShouldUsePayPerRequestBilling": {
+      "Fn::Equals": [
+        {
+          "Ref": "DynamoDBBillingMode"
+        },
+        "PAY_PER_REQUEST"
+      ]
+    },
+    "ShouldUsePointInTimeRecovery": {
+      "Fn::Equals": [
+        {
+          "Ref": "DynamoDBEnablePointInTimeRecovery"
+        },
+        "true"
+      ]
+    }
+  },
+  "Resources": {
+    "LobbiesJoinedTable": {
+      "Type": "AWS::DynamoDB::Table",
+      "Properties": {
+        "KeySchema": [
+          {
+            "AttributeName": "id",
+            "KeyType": "HASH"
+          }
+        ],
+        "AttributeDefinitions": [
+          {
+            "AttributeName": "id",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "lobbyId",
+            "AttributeType": "S"
+          },
+          {
+            "AttributeName": "userId",
+            "AttributeType": "S"
+          }
+        ],
+        "BillingMode": {
+          "Fn::If": [
+            "ShouldUsePayPerRequestBilling",
+            "PAY_PER_REQUEST",
+            {
+              "Ref": "AWS::NoValue"
+            }
+          ]
+        },
+        "GlobalSecondaryIndexes": [
+          {
+            "IndexName": "byLobby",
+            "KeySchema": [
+              {
+                "AttributeName": "lobbyId",
+                "KeyType": "HASH"
+              }
+            ],
+            "Projection": {
+              "ProjectionType": "ALL"
+            },
+            "ProvisionedThroughput": {
+              "Fn::If": [
+                "ShouldUsePayPerRequestBilling",
+                {
+                  "Ref": "AWS::NoValue"
+                },
+                {
+                  "ReadCapacityUnits": {
+                    "Ref": "DynamoDBModelTableReadIOPS"
+                  },
+                  "WriteCapacityUnits": {
+                    "Ref": "DynamoDBModelTableWriteIOPS"
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "IndexName": "byUser",
+            "KeySchema": [
+              {
+                "AttributeName": "userId",
+                "KeyType": "HASH"
+              }
+            ],
+            "Projection": {
+              "ProjectionType": "ALL"
+            },
+            "ProvisionedThroughput": {
+              "Fn::If": [
+                "ShouldUsePayPerRequestBilling",
+                {
+                  "Ref": "AWS::NoValue"
+                },
+                {
+                  "ReadCapacityUnits": {
+                    "Ref": "DynamoDBModelTableReadIOPS"
+                  },
+                  "WriteCapacityUnits": {
+                    "Ref": "DynamoDBModelTableWriteIOPS"
+                  }
+                }
+              ]
+            }
+          }
+        ],
+        "PointInTimeRecoverySpecification": {
+          "Fn::If": [
+            "ShouldUsePointInTimeRecovery",
+            {
+              "PointInTimeRecoveryEnabled": true
+            },
+            {
+              "Ref": "AWS::NoValue"
+            }
+          ]
+        },
+        "ProvisionedThroughput": {
+          "Fn::If": [
+            "ShouldUsePayPerRequestBilling",
+            {
+              "Ref": "AWS::NoValue"
+            },
+            {
+              "ReadCapacityUnits": {
+                "Ref": "DynamoDBModelTableReadIOPS"
+              },
+              "WriteCapacityUnits": {
+                "Ref": "DynamoDBModelTableWriteIOPS"
+              }
+            }
+          ]
+        },
+        "SSESpecification": {
+          "SSEEnabled": {
+            "Fn::If": [
+              "ShouldUseServerSideEncryption",
+              true,
+              false
+            ]
+          }
+        },
+        "StreamSpecification": {
+          "StreamViewType": "NEW_AND_OLD_IMAGES"
+        },
+        "TableName": {
+          "Fn::Join": [
+            "",
+            [
+              "LobbiesJoined-",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "-",
+              {
+                "Ref": "referencetotransformerrootstackenv10C5A902Ref"
+              }
+            ]
+          ]
+        }
+      },
+      "UpdateReplacePolicy": "Delete",
+      "DeletionPolicy": "Delete"
+    },
+    "LobbiesJoinedIAMRoleDD62DBD7": {
+      "Type": "AWS::IAM::Role",
+      "Properties": {
+        "AssumeRolePolicyDocument": {
+          "Statement": [
+            {
+              "Action": "sts:AssumeRole",
+              "Effect": "Allow",
+              "Principal": {
+                "Service": "appsync.amazonaws.com"
+              }
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "RoleName": {
+          "Fn::Join": [
+            "",
+            [
+              "LobbiesJoinedIAMRoleaef2a5-",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "-",
+              {
+                "Ref": "referencetotransformerrootstackenv10C5A902Ref"
+              }
+            ]
+          ]
+        }
+      }
+    },
+    "LobbiesJoinedIAMRoleDefaultPolicyB9B4AB61": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:GetRecords",
+                "dynamodb:GetShardIterator",
+                "dynamodb:Query",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:ConditionCheckItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:UpdateItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:DescribeTable"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::GetAtt": [
+                    "LobbiesJoinedTable",
+                    "Arn"
+                  ]
+                },
+                {
+                  "Fn::Join": [
+                    "",
+                    [
+                      {
+                        "Fn::GetAtt": [
+                          "LobbiesJoinedTable",
+                          "Arn"
+                        ]
+                      },
+                      "/index/*"
+                    ]
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "LobbiesJoinedIAMRoleDefaultPolicyB9B4AB61",
+        "Roles": [
+          {
+            "Ref": "LobbiesJoinedIAMRoleDD62DBD7"
+          }
+        ]
+      }
+    },
+    "DynamoDBAccess71ABE5AE": {
+      "Type": "AWS::IAM::Policy",
+      "Properties": {
+        "PolicyDocument": {
+          "Statement": [
+            {
+              "Action": [
+                "dynamodb:BatchGetItem",
+                "dynamodb:BatchWriteItem",
+                "dynamodb:PutItem",
+                "dynamodb:DeleteItem",
+                "dynamodb:GetItem",
+                "dynamodb:Scan",
+                "dynamodb:Query",
+                "dynamodb:UpdateItem"
+              ],
+              "Effect": "Allow",
+              "Resource": [
+                {
+                  "Fn::Sub": [
+                    "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}",
+                    {
+                      "tablename": {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "LobbiesJoined-",
+                            {
+                              "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+                            },
+                            "-",
+                            {
+                              "Ref": "referencetotransformerrootstackenv10C5A902Ref"
+                            }
+                          ]
+                        ]
+                      }
+                    }
+                  ]
+                },
+                {
+                  "Fn::Sub": [
+                    "arn:aws:dynamodb:${AWS::Region}:${AWS::AccountId}:table/${tablename}/*",
+                    {
+                      "tablename": {
+                        "Fn::Join": [
+                          "",
+                          [
+                            "LobbiesJoined-",
+                            {
+                              "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+                            },
+                            "-",
+                            {
+                              "Ref": "referencetotransformerrootstackenv10C5A902Ref"
+                            }
+                          ]
+                        ]
+                      }
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
+          "Version": "2012-10-17"
+        },
+        "PolicyName": "DynamoDBAccess71ABE5AE",
+        "Roles": [
+          {
+            "Ref": "LobbiesJoinedIAMRoleDD62DBD7"
+          }
+        ]
+      }
+    },
+    "LobbiesJoinedDataSource": {
+      "Type": "AWS::AppSync::DataSource",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "Name": "LobbiesJoinedTable",
+        "Type": "AMAZON_DYNAMODB",
+        "DynamoDBConfig": {
+          "AwsRegion": {
+            "Ref": "AWS::Region"
+          },
+          "TableName": {
+            "Ref": "LobbiesJoinedTable"
+          }
+        },
+        "ServiceRoleArn": {
+          "Fn::GetAtt": [
+            "LobbiesJoinedIAMRoleDD62DBD7",
+            "Arn"
+          ]
+        }
+      },
+      "DependsOn": [
+        "LobbiesJoinedIAMRoleDD62DBD7"
+      ]
+    },
+    "QueryGetLobbiesJoinedDataResolverFnQueryGetLobbiesJoinedDataResolverFnAppSyncFunction7CC983CF": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "LobbiesJoinedDataSource",
+            "Name"
+          ]
+        },
+        "Name": "QueryGetLobbiesJoinedDataResolverFn",
+        "FunctionVersion": "2018-05-29",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Query.getLobbiesJoined.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Query.getLobbiesJoined.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "LobbiesJoinedDataSource"
+      ]
+    },
+    "GetLobbiesJoinedResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "getLobbiesJoined",
+        "TypeName": "Query",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundauth0FunctionQuerygetGameRoundauth0FunctionAppSyncFunction415FA646FunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundpostAuth0FunctionQuerygetGameRoundpostAuth0FunctionAppSyncFunction5077CAEDFunctionId"
+            },
+            {
+              "Fn::GetAtt": [
+                "QueryGetLobbiesJoinedDataResolverFnQueryGetLobbiesJoinedDataResolverFnAppSyncFunction7CC983CF",
+                "FunctionId"
+              ]
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"getLobbiesJoined\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+              {
+                "Ref": "LobbiesJoinedTable"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"authRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackauthRoleNameFB872D50Ref"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackunauthRoleName49F3C1FERef"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ca-central-1:d9dd0a89-13cb-42fa-852b-c4325fc26665\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ca-central-1_iT20xBsTg_Full-access/CognitoIdentityCredentials\",\"ca-central-1_iT20xBsTg_Manage-only/CognitoIdentityCredentials\",\"DeenDownAuthPostConfirmation-dev\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)"
+      }
+    },
+    "QueryListLobbiesJoinedsDataResolverFnQueryListLobbiesJoinedsDataResolverFnAppSyncFunction0031B8E4": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "LobbiesJoinedDataSource",
+            "Name"
+          ]
+        },
+        "Name": "QueryListLobbiesJoinedsDataResolverFn",
+        "FunctionVersion": "2018-05-29",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Query.listLobbiesJoineds.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Query.listLobbiesJoineds.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "LobbiesJoinedDataSource"
+      ]
+    },
+    "ListLobbiesJoinedResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "listLobbiesJoineds",
+        "TypeName": "Query",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundauth0FunctionQuerygetGameRoundauth0FunctionAppSyncFunction415FA646FunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundpostAuth0FunctionQuerygetGameRoundpostAuth0FunctionAppSyncFunction5077CAEDFunctionId"
+            },
+            {
+              "Fn::GetAtt": [
+                "QueryListLobbiesJoinedsDataResolverFnQueryListLobbiesJoinedsDataResolverFnAppSyncFunction0031B8E4",
+                "FunctionId"
+              ]
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"listLobbiesJoineds\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+              {
+                "Ref": "LobbiesJoinedTable"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"authRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackauthRoleNameFB872D50Ref"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackunauthRoleName49F3C1FERef"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ca-central-1:d9dd0a89-13cb-42fa-852b-c4325fc26665\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ca-central-1_iT20xBsTg_Full-access/CognitoIdentityCredentials\",\"ca-central-1_iT20xBsTg_Manage-only/CognitoIdentityCredentials\",\"DeenDownAuthPostConfirmation-dev\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)"
+      }
+    },
+    "MutationCreateLobbiesJoinedDataResolverFnMutationCreateLobbiesJoinedDataResolverFnAppSyncFunction7C2FE04B": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "LobbiesJoinedDataSource",
+            "Name"
+          ]
+        },
+        "Name": "MutationCreateLobbiesJoinedDataResolverFn",
+        "FunctionVersion": "2018-05-29",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.createLobbiesJoined.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.createLobbiesJoined.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "LobbiesJoinedDataSource"
+      ]
+    },
+    "CreateLobbiesJoinedResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "createLobbiesJoined",
+        "TypeName": "Mutation",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundMutationcreateGameRoundinit0FunctionMutationcreateGameRoundinit0FunctionAppSyncFunctionBA380DFFFunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundMutationcreateGameRoundauth0FunctionMutationcreateGameRoundauth0FunctionAppSyncFunctionABE5F250FunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundpostAuth0FunctionQuerygetGameRoundpostAuth0FunctionAppSyncFunction5077CAEDFunctionId"
+            },
+            {
+              "Fn::GetAtt": [
+                "MutationCreateLobbiesJoinedDataResolverFnMutationCreateLobbiesJoinedDataResolverFnAppSyncFunction7C2FE04B",
+                "FunctionId"
+              ]
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"createLobbiesJoined\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+              {
+                "Ref": "LobbiesJoinedTable"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"authRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackauthRoleNameFB872D50Ref"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackunauthRoleName49F3C1FERef"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ca-central-1:d9dd0a89-13cb-42fa-852b-c4325fc26665\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ca-central-1_iT20xBsTg_Full-access/CognitoIdentityCredentials\",\"ca-central-1_iT20xBsTg_Manage-only/CognitoIdentityCredentials\",\"DeenDownAuthPostConfirmation-dev\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)"
+      }
+    },
+    "MutationupdateLobbiesJoinedauth0FunctionMutationupdateLobbiesJoinedauth0FunctionAppSyncFunction7DAEFBA6": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "LobbiesJoinedDataSource",
+            "Name"
+          ]
+        },
+        "Name": "MutationupdateLobbiesJoinedauth0Function",
+        "FunctionVersion": "2018-05-29",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.updateLobbiesJoined.auth.1.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.updateLobbiesJoined.auth.1.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "LobbiesJoinedDataSource"
+      ]
+    },
+    "MutationUpdateLobbiesJoinedDataResolverFnMutationUpdateLobbiesJoinedDataResolverFnAppSyncFunctionE4D898AB": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "LobbiesJoinedDataSource",
+            "Name"
+          ]
+        },
+        "Name": "MutationUpdateLobbiesJoinedDataResolverFn",
+        "FunctionVersion": "2018-05-29",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.updateLobbiesJoined.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.updateLobbiesJoined.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "LobbiesJoinedDataSource"
+      ]
+    },
+    "UpdateLobbiesJoinedResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "updateLobbiesJoined",
+        "TypeName": "Mutation",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundMutationupdateGameRoundinit0FunctionMutationupdateGameRoundinit0FunctionAppSyncFunctionB5A78DEBFunctionId"
+            },
+            {
+              "Fn::GetAtt": [
+                "MutationupdateLobbiesJoinedauth0FunctionMutationupdateLobbiesJoinedauth0FunctionAppSyncFunction7DAEFBA6",
+                "FunctionId"
+              ]
+            },
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundpostAuth0FunctionQuerygetGameRoundpostAuth0FunctionAppSyncFunction5077CAEDFunctionId"
+            },
+            {
+              "Fn::GetAtt": [
+                "MutationUpdateLobbiesJoinedDataResolverFnMutationUpdateLobbiesJoinedDataResolverFnAppSyncFunctionE4D898AB",
+                "FunctionId"
+              ]
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"updateLobbiesJoined\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+              {
+                "Ref": "LobbiesJoinedTable"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"authRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackauthRoleNameFB872D50Ref"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackunauthRoleName49F3C1FERef"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ca-central-1:d9dd0a89-13cb-42fa-852b-c4325fc26665\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ca-central-1_iT20xBsTg_Full-access/CognitoIdentityCredentials\",\"ca-central-1_iT20xBsTg_Manage-only/CognitoIdentityCredentials\",\"DeenDownAuthPostConfirmation-dev\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)"
+      }
+    },
+    "MutationdeleteLobbiesJoinedauth0FunctionMutationdeleteLobbiesJoinedauth0FunctionAppSyncFunctionE0EF4939": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "LobbiesJoinedDataSource",
+            "Name"
+          ]
+        },
+        "Name": "MutationdeleteLobbiesJoinedauth0Function",
+        "FunctionVersion": "2018-05-29",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.deleteLobbiesJoined.auth.1.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.deleteLobbiesJoined.auth.1.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "LobbiesJoinedDataSource"
+      ]
+    },
+    "MutationDeleteLobbiesJoinedDataResolverFnMutationDeleteLobbiesJoinedDataResolverFnAppSyncFunction7BBB15D9": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "LobbiesJoinedDataSource",
+            "Name"
+          ]
+        },
+        "Name": "MutationDeleteLobbiesJoinedDataResolverFn",
+        "FunctionVersion": "2018-05-29",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.deleteLobbiesJoined.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Mutation.deleteLobbiesJoined.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "LobbiesJoinedDataSource"
+      ]
+    },
+    "DeleteLobbiesJoinedResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "deleteLobbiesJoined",
+        "TypeName": "Mutation",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Fn::GetAtt": [
+                "MutationdeleteLobbiesJoinedauth0FunctionMutationdeleteLobbiesJoinedauth0FunctionAppSyncFunctionE0EF4939",
+                "FunctionId"
+              ]
+            },
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundpostAuth0FunctionQuerygetGameRoundpostAuth0FunctionAppSyncFunction5077CAEDFunctionId"
+            },
+            {
+              "Fn::GetAtt": [
+                "MutationDeleteLobbiesJoinedDataResolverFnMutationDeleteLobbiesJoinedDataResolverFnAppSyncFunction7BBB15D9",
+                "FunctionId"
+              ]
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Mutation\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"deleteLobbiesJoined\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+              {
+                "Ref": "LobbiesJoinedTable"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"authRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackauthRoleNameFB872D50Ref"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackunauthRoleName49F3C1FERef"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ca-central-1:d9dd0a89-13cb-42fa-852b-c4325fc26665\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ca-central-1_iT20xBsTg_Full-access/CognitoIdentityCredentials\",\"ca-central-1_iT20xBsTg_Manage-only/CognitoIdentityCredentials\",\"DeenDownAuthPostConfirmation-dev\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)"
+      }
+    },
+    "SubscriptiononCreateLobbiesJoinedResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "onCreateLobbiesJoined",
+        "TypeName": "Subscription",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundSubscriptiononCreateGameRoundauth0FunctionSubscriptiononCreateGameRoundauth0FunctionAppSyncFunction42F0E2ADFunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundpostAuth0FunctionQuerygetGameRoundpostAuth0FunctionAppSyncFunction5077CAEDFunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundSubscriptionOnCreateGameRoundDataResolverFnSubscriptionOnCreateGameRoundDataResolverFnAppSyncFunction9784FAFFFunctionId"
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onCreateLobbiesJoined\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"authRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackauthRoleNameFB872D50Ref"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackunauthRoleName49F3C1FERef"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ca-central-1:d9dd0a89-13cb-42fa-852b-c4325fc26665\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ca-central-1_iT20xBsTg_Full-access/CognitoIdentityCredentials\",\"ca-central-1_iT20xBsTg_Manage-only/CognitoIdentityCredentials\",\"DeenDownAuthPostConfirmation-dev\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)"
+      }
+    },
+    "SubscriptiononUpdateLobbiesJoinedResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "onUpdateLobbiesJoined",
+        "TypeName": "Subscription",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundSubscriptiononCreateGameRoundauth0FunctionSubscriptiononCreateGameRoundauth0FunctionAppSyncFunction42F0E2ADFunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundpostAuth0FunctionQuerygetGameRoundpostAuth0FunctionAppSyncFunction5077CAEDFunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundSubscriptionOnCreateGameRoundDataResolverFnSubscriptionOnCreateGameRoundDataResolverFnAppSyncFunction9784FAFFFunctionId"
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onUpdateLobbiesJoined\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"authRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackauthRoleNameFB872D50Ref"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackunauthRoleName49F3C1FERef"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ca-central-1:d9dd0a89-13cb-42fa-852b-c4325fc26665\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ca-central-1_iT20xBsTg_Full-access/CognitoIdentityCredentials\",\"ca-central-1_iT20xBsTg_Manage-only/CognitoIdentityCredentials\",\"DeenDownAuthPostConfirmation-dev\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)"
+      }
+    },
+    "SubscriptiononDeleteLobbiesJoinedResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "onDeleteLobbiesJoined",
+        "TypeName": "Subscription",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundSubscriptiononCreateGameRoundauth0FunctionSubscriptiononCreateGameRoundauth0FunctionAppSyncFunction42F0E2ADFunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundpostAuth0FunctionQuerygetGameRoundpostAuth0FunctionAppSyncFunction5077CAEDFunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundSubscriptionOnCreateGameRoundDataResolverFnSubscriptionOnCreateGameRoundDataResolverFnAppSyncFunction9784FAFFFunctionId"
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Subscription\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"onDeleteLobbiesJoined\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"NONE\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n\n$util.qr($ctx.stash.put(\"authRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackauthRoleNameFB872D50Ref"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackunauthRoleName49F3C1FERef"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ca-central-1:d9dd0a89-13cb-42fa-852b-c4325fc26665\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ca-central-1_iT20xBsTg_Full-access/CognitoIdentityCredentials\",\"ca-central-1_iT20xBsTg_Manage-only/CognitoIdentityCredentials\",\"DeenDownAuthPostConfirmation-dev\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)"
+      }
+    },
+    "QueryLobbiesJoinedsByLobbyIdDataResolverFnQueryLobbiesJoinedsByLobbyIdDataResolverFnAppSyncFunction03FA7D52": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "LobbiesJoinedDataSource",
+            "Name"
+          ]
+        },
+        "Name": "QueryLobbiesJoinedsByLobbyIdDataResolverFn",
+        "FunctionVersion": "2018-05-29",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Query.lobbiesJoinedsByLobbyId.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Query.lobbiesJoinedsByLobbyId.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "LobbiesJoinedDataSource"
+      ]
+    },
+    "QuerylobbiesJoinedsByLobbyIdResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "lobbiesJoinedsByLobbyId",
+        "TypeName": "Query",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundauth0FunctionQuerygetGameRoundauth0FunctionAppSyncFunction415FA646FunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundpostAuth0FunctionQuerygetGameRoundpostAuth0FunctionAppSyncFunction5077CAEDFunctionId"
+            },
+            {
+              "Fn::GetAtt": [
+                "QueryLobbiesJoinedsByLobbyIdDataResolverFnQueryLobbiesJoinedsByLobbyIdDataResolverFnAppSyncFunction03FA7D52",
+                "FunctionId"
+              ]
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"lobbiesJoinedsByLobbyId\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+              {
+                "Ref": "LobbiesJoinedTable"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"authRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackauthRoleNameFB872D50Ref"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackunauthRoleName49F3C1FERef"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ca-central-1:d9dd0a89-13cb-42fa-852b-c4325fc26665\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ca-central-1_iT20xBsTg_Full-access/CognitoIdentityCredentials\",\"ca-central-1_iT20xBsTg_Manage-only/CognitoIdentityCredentials\",\"DeenDownAuthPostConfirmation-dev\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)"
+      }
+    },
+    "QueryLobbiesJoinedsByUserIdDataResolverFnQueryLobbiesJoinedsByUserIdDataResolverFnAppSyncFunctionA9C9D93A": {
+      "Type": "AWS::AppSync::FunctionConfiguration",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "DataSourceName": {
+          "Fn::GetAtt": [
+            "LobbiesJoinedDataSource",
+            "Name"
+          ]
+        },
+        "Name": "QueryLobbiesJoinedsByUserIdDataResolverFn",
+        "FunctionVersion": "2018-05-29",
+        "RequestMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Query.lobbiesJoinedsByUserId.req.vtl"
+            ]
+          ]
+        },
+        "ResponseMappingTemplateS3Location": {
+          "Fn::Join": [
+            "",
+            [
+              "s3://",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentBucket7592718ARef"
+              },
+              "/",
+              {
+                "Ref": "referencetotransformerrootstackS3DeploymentRootKeyA71EA735Ref"
+              },
+              "/resolvers/Query.lobbiesJoinedsByUserId.res.vtl"
+            ]
+          ]
+        }
+      },
+      "DependsOn": [
+        "LobbiesJoinedDataSource"
+      ]
+    },
+    "QuerylobbiesJoinedsByUserIdResolver": {
+      "Type": "AWS::AppSync::Resolver",
+      "Properties": {
+        "ApiId": {
+          "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+        },
+        "FieldName": "lobbiesJoinedsByUserId",
+        "TypeName": "Query",
+        "Kind": "PIPELINE",
+        "PipelineConfig": {
+          "Functions": [
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundauth0FunctionQuerygetGameRoundauth0FunctionAppSyncFunction415FA646FunctionId"
+            },
+            {
+              "Ref": "referencetotransformerrootstackGameRoundNestedStackGameRoundNestedStackResourceD4335EB7OutputstransformerrootstackGameRoundQuerygetGameRoundpostAuth0FunctionQuerygetGameRoundpostAuth0FunctionAppSyncFunction5077CAEDFunctionId"
+            },
+            {
+              "Fn::GetAtt": [
+                "QueryLobbiesJoinedsByUserIdDataResolverFnQueryLobbiesJoinedsByUserIdDataResolverFnAppSyncFunctionA9C9D93A",
+                "FunctionId"
+              ]
+            }
+          ]
+        },
+        "RequestMappingTemplate": {
+          "Fn::Join": [
+            "",
+            [
+              "$util.qr($ctx.stash.put(\"typeName\", \"Query\"))\n$util.qr($ctx.stash.put(\"fieldName\", \"lobbiesJoinedsByUserId\"))\n$util.qr($ctx.stash.put(\"conditions\", []))\n$util.qr($ctx.stash.put(\"metadata\", {}))\n$util.qr($ctx.stash.metadata.put(\"dataSourceType\", \"AMAZON_DYNAMODB\"))\n$util.qr($ctx.stash.metadata.put(\"apiId\", \"",
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"connectionAttributes\", {}))\n$util.qr($ctx.stash.put(\"tableName\", \"",
+              {
+                "Ref": "LobbiesJoinedTable"
+              },
+              "\"))\n$util.qr($ctx.stash.put(\"authRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackauthRoleNameFB872D50Ref"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"unauthRole\", \"arn:aws:sts::",
+              {
+                "Ref": "AWS::AccountId"
+              },
+              ":assumed-role/",
+              {
+                "Ref": "referencetotransformerrootstackunauthRoleName49F3C1FERef"
+              },
+              "/CognitoIdentityCredentials\"))\n$util.qr($ctx.stash.put(\"identityPoolId\", \"ca-central-1:d9dd0a89-13cb-42fa-852b-c4325fc26665\"))\n$util.qr($ctx.stash.put(\"adminRoles\", [\"ca-central-1_iT20xBsTg_Full-access/CognitoIdentityCredentials\",\"ca-central-1_iT20xBsTg_Manage-only/CognitoIdentityCredentials\",\"DeenDownAuthPostConfirmation-dev\"]))\n$util.toJson({})"
+            ]
+          ]
+        },
+        "ResponseMappingTemplate": "$util.toJson($ctx.prev.result)"
+      }
+    }
+  },
+  "Outputs": {
+    "GetAttLobbiesJoinedTableStreamArn": {
+      "Description": "Your DynamoDB table StreamArn.",
+      "Value": {
+        "Fn::GetAtt": [
+          "LobbiesJoinedTable",
+          "StreamArn"
+        ]
+      },
+      "Export": {
+        "Name": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "GetAtt:LobbiesJoinedTable:StreamArn"
+            ]
+          ]
+        }
+      }
+    },
+    "GetAttLobbiesJoinedTableName": {
+      "Description": "Your DynamoDB table name.",
+      "Value": {
+        "Ref": "LobbiesJoinedTable"
+      },
+      "Export": {
+        "Name": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "GetAtt:LobbiesJoinedTable:Name"
+            ]
+          ]
+        }
+      }
+    },
+    "GetAttLobbiesJoinedDataSourceName": {
+      "Description": "Your model DataSource name.",
+      "Value": {
+        "Fn::GetAtt": [
+          "LobbiesJoinedDataSource",
+          "Name"
+        ]
+      },
+      "Export": {
+        "Name": {
+          "Fn::Join": [
+            ":",
+            [
+              {
+                "Ref": "referencetotransformerrootstackGraphQLAPI20497F53ApiId"
+              },
+              "GetAtt:LobbiesJoinedDataSource:Name"
+            ]
+          ]
+        }
+      }
+    },
+    "transformerrootstackLobbiesJoinedLobbiesJoinedDataSourceEEBAB62DName": {
+      "Value": {
+        "Fn::GetAtt": [
+          "LobbiesJoinedDataSource",
+          "Name"
+        ]
+      }
+    },
+    "transformerrootstackLobbiesJoinedLobbiesJoinedTableC071E9B9Ref": {
+      "Value": {
+        "Ref": "LobbiesJoinedTable"
+      }
+    }
+  }
+}

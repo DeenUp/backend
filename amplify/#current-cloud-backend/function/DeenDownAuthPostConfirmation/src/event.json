@@ -1,0 +1,26 @@
+{
+	"version": "1",
+	"region": "ca-central-1",
+	"userPoolId": "ca-central-1_D7ANabzJu",
+	"userName": "636bc392-480f-46c3-8be9-5c0c76419c65",
+	"callerContext": {
+		"awsSdkVersion": "aws-sdk-unknown-unknown",
+		"clientId": "4dhanlfjf4bb1e9mf5q4e0ipcm"
+	},
+	"triggerSource": "PostConfirmation_ConfirmSignUp",
+	"request": {
+		"userAttributes": {
+			"cognito:user_status": "CONFIRMED",
+			"cognito:email_alias": "mohd@mohd.ca",
+			"custom:user_type": "EXPERT",
+			"custom:linked_in": "https://www.linkedin.com/in/mohamed-mohamed-0b1b0b1b/",
+			"email": "mohd@mohd.ca",
+			"email_verified": "true",
+			"family_name": "Mohamed",
+			"given_name": "Mohamed",
+			"name": "Mohamed Mohamed",
+			"sub": "636bc392-480f-46c3-8be9-5c0c76419c65"
+		}
+	},
+	"response": {}
+}

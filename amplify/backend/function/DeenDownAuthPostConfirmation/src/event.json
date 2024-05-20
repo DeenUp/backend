@@ -1,0 +1,23 @@
+{
+	"version": "1",
+	"region": "ca-central-1",
+	"userPoolId": "ca-central-1_ll0YdbSLi",
+	"userName": "0c0d65d8-80c1-7020-7a88-227aaf8097ed",
+	"callerContext": {
+		"awsSdkVersion": "aws-sdk-unknown-unknown",
+		"clientId": "4dhanlfjf4bb1e9mf5q4e0ipcm"
+	},
+	"triggerSource": "PostConfirmation_ConfirmSignUp",
+	"request": {
+		"userAttributes": {
+			"cognito:user_status": "CONFIRMED",
+			"cognito:email_alias": "boceh61536@eryod.com",
+			"custom:user_type": "PLAYER",
+			"email": "boceh61536@eryod.com",
+			"email_verified": "true",
+			"name": "Ali",
+			"sub": "0c0d65d8-80c1-7020-7a88-227aaf8097ed"
+		}
+	},
+	"response": {}
+}

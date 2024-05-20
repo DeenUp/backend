@@ -1,0 +1,682 @@
+type GameRound @aws_iam @aws_cognito_user_pools {
+  id: ID!
+  index: Int!
+  question: String!
+  correctAnswer: String!
+  isComplete: Boolean!
+  submittedAnswers(filter: ModelSubmittedAnswerFilterInput, sortDirection: ModelSortDirection, limit: Int, nextToken: String): ModelSubmittedAnswerConnection
+  gameSessionID: ID!
+  gameSession: GameSession!
+  updatedAt: AWSDateTime!
+  createdAt: AWSDateTime!
+}
+
+type SubmittedAnswer @aws_iam @aws_cognito_user_pools {
+  id: ID!
+  answer: String!
+  isCorrect: Boolean
+  userID: ID!
+  user: User!
+  gameRoundID: ID!
+  gameRound: GameRound!
+  updatedAt: AWSDateTime!
+  createdAt: AWSDateTime!
+}
+
+type GameSession @aws_iam @aws_cognito_user_pools {
+  id: ID!
+  lobbyID: ID!
+  lobby: Lobby!
+  rounds(filter: ModelGameRoundFilterInput, sortDirection: ModelSortDirection, limit: Int, nextToken: String): ModelGameRoundConnection
+  updatedAt: AWSDateTime!
+  createdAt: AWSDateTime!
+}
+
+type Lobby @aws_iam @aws_cognito_user_pools {
+  id: ID!
+  code: String!
+  isActive: Boolean!
+  participants(filter: ModelParticipantFilterInput, sortDirection: ModelSortDirection, limit: Int, nextToken: String): ModelParticipantConnection
+  creatorID: ID!
+  creator: User!
+  gameSessionID: ID
+  gameSession: GameSession
+  updatedAt: AWSDateTime!
+  createdAt: AWSDateTime!
+}
+
+type Question @aws_iam @aws_cognito_user_pools {
+  text: ID!
+  answers: [Answer!]!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+type User @aws_iam @aws_cognito_user_pools {
+  id: ID!
+  email: AWSEmail!
+  name: String!
+  selfie: String
+  status: UserStatus!
+  type: UserType!
+  createdLobbies(filter: ModelLobbyFilterInput, sortDirection: ModelSortDirection, limit: Int, nextToken: String): ModelLobbyConnection
+  joinedLobbies(filter: ModelParticipantFilterInput, sortDirection: ModelSortDirection, limit: Int, nextToken: String): ModelParticipantConnection
+  submittedAnswers(filter: ModelSubmittedAnswerFilterInput, sortDirection: ModelSortDirection, limit: Int, nextToken: String): ModelSubmittedAnswerConnection
+  updatedAt: AWSDateTime!
+  createdAt: AWSDateTime!
+}
+
+type Answer @aws_iam @aws_cognito_user_pools {
+  text: String!
+  isCorrect: Boolean!
+}
+
+enum UserStatus {
+  ACTIVE
+  SUSPENDED
+}
+
+enum UserType {
+  ADMIN
+  PLAYER
+}
+
+type Participant @aws_iam @aws_cognito_user_pools {
+  id: ID!
+  lobbyId: ID!
+  userId: ID!
+  lobby: Lobby!
+  user: User!
+  createdAt: AWSDateTime!
+  updatedAt: AWSDateTime!
+}
+
+input ModelStringInput {
+  ne: String
+  eq: String
+  le: String
+  lt: String
+  ge: String
+  gt: String
+  contains: String
+  notContains: String
+  between: [String]
+  beginsWith: String
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  size: ModelSizeInput
+}
+
+input ModelIntInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelFloatInput {
+  ne: Float
+  eq: Float
+  le: Float
+  lt: Float
+  ge: Float
+  gt: Float
+  between: [Float]
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelBooleanInput {
+  ne: Boolean
+  eq: Boolean
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+}
+
+input ModelIDInput {
+  ne: ID
+  eq: ID
+  le: ID
+  lt: ID
+  ge: ID
+  gt: ID
+  contains: ID
+  notContains: ID
+  between: [ID]
+  beginsWith: ID
+  attributeExists: Boolean
+  attributeType: ModelAttributeTypes
+  size: ModelSizeInput
+}
+
+input ModelSubscriptionStringInput {
+  ne: String
+  eq: String
+  le: String
+  lt: String
+  ge: String
+  gt: String
+  contains: String
+  notContains: String
+  between: [String]
+  beginsWith: String
+  in: [String]
+  notIn: [String]
+}
+
+input ModelSubscriptionIntInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+  in: [Int]
+  notIn: [Int]
+}
+
+input ModelSubscriptionFloatInput {
+  ne: Float
+  eq: Float
+  le: Float
+  lt: Float
+  ge: Float
+  gt: Float
+  between: [Float]
+  in: [Float]
+  notIn: [Float]
+}
+
+input ModelSubscriptionBooleanInput {
+  ne: Boolean
+  eq: Boolean
+}
+
+input ModelSubscriptionIDInput {
+  ne: ID
+  eq: ID
+  le: ID
+  lt: ID
+  ge: ID
+  gt: ID
+  contains: ID
+  notContains: ID
+  between: [ID]
+  beginsWith: ID
+  in: [ID]
+  notIn: [ID]
+}
+
+enum ModelAttributeTypes {
+  binary
+  binarySet
+  bool
+  list
+  map
+  number
+  numberSet
+  string
+  stringSet
+  _null
+}
+
+input ModelSizeInput {
+  ne: Int
+  eq: Int
+  le: Int
+  lt: Int
+  ge: Int
+  gt: Int
+  between: [Int]
+}
+
+enum ModelSortDirection {
+  ASC
+  DESC
+}
+
+type ModelGameRoundConnection @aws_iam @aws_cognito_user_pools {
+  items: [GameRound]!
+  nextToken: String
+}
+
+input ModelGameRoundFilterInput {
+  id: ModelIDInput
+  index: ModelIntInput
+  question: ModelStringInput
+  correctAnswer: ModelStringInput
+  isComplete: ModelBooleanInput
+  gameSessionID: ModelIDInput
+  updatedAt: ModelStringInput
+  createdAt: ModelStringInput
+  and: [ModelGameRoundFilterInput]
+  or: [ModelGameRoundFilterInput]
+  not: ModelGameRoundFilterInput
+}
+
+type Query {
+  getGameRound(id: ID!): GameRound @aws_iam @aws_cognito_user_pools
+  listGameRounds(filter: ModelGameRoundFilterInput, limit: Int, nextToken: String): ModelGameRoundConnection @aws_iam @aws_cognito_user_pools
+  getGameRoundByGameSessionID(gameSessionID: ID!, sortDirection: ModelSortDirection, filter: ModelGameRoundFilterInput, limit: Int, nextToken: String): ModelGameRoundConnection @aws_iam @aws_cognito_user_pools
+  getSubmittedAnswer(id: ID!): SubmittedAnswer @aws_iam @aws_cognito_user_pools
+  listSubmittedAnswers(filter: ModelSubmittedAnswerFilterInput, limit: Int, nextToken: String): ModelSubmittedAnswerConnection @aws_iam @aws_cognito_user_pools
+  getSubmittedAnswerByUserID(userID: ID!, sortDirection: ModelSortDirection, filter: ModelSubmittedAnswerFilterInput, limit: Int, nextToken: String): ModelSubmittedAnswerConnection @aws_iam @aws_cognito_user_pools
+  getSubmittedAnswerByGameRoundID(gameRoundID: ID!, sortDirection: ModelSortDirection, filter: ModelSubmittedAnswerFilterInput, limit: Int, nextToken: String): ModelSubmittedAnswerConnection @aws_iam @aws_cognito_user_pools
+  getGameSession(id: ID!): GameSession @aws_iam @aws_cognito_user_pools
+  listGameSessions(filter: ModelGameSessionFilterInput, limit: Int, nextToken: String): ModelGameSessionConnection @aws_iam @aws_cognito_user_pools
+  getGameSessionByLobbyID(lobbyID: ID!, sortDirection: ModelSortDirection, filter: ModelGameSessionFilterInput, limit: Int, nextToken: String): ModelGameSessionConnection @aws_iam @aws_cognito_user_pools
+  getLobby(id: ID!): Lobby @aws_iam @aws_cognito_user_pools
+  listLobbies(filter: ModelLobbyFilterInput, limit: Int, nextToken: String): ModelLobbyConnection @aws_iam @aws_cognito_user_pools
+  getLobbyByCode(code: String!, sortDirection: ModelSortDirection, filter: ModelLobbyFilterInput, limit: Int, nextToken: String): ModelLobbyConnection @aws_iam @aws_cognito_user_pools
+  getLobbyByCreatorID(creatorID: ID!, sortDirection: ModelSortDirection, filter: ModelLobbyFilterInput, limit: Int, nextToken: String): ModelLobbyConnection @aws_iam @aws_cognito_user_pools
+  getLobbyByGameSessionID(gameSessionID: ID!, sortDirection: ModelSortDirection, filter: ModelLobbyFilterInput, limit: Int, nextToken: String): ModelLobbyConnection @aws_iam @aws_cognito_user_pools
+  getUser(id: ID!): User @aws_iam @aws_cognito_user_pools
+  listUsers(filter: ModelUserFilterInput, limit: Int, nextToken: String): ModelUserConnection @aws_iam @aws_cognito_user_pools
+  getUserByEmail(email: AWSEmail!, sortDirection: ModelSortDirection, filter: ModelUserFilterInput, limit: Int, nextToken: String): ModelUserConnection @aws_iam @aws_cognito_user_pools
+  getParticipant(id: ID!): Participant @aws_iam @aws_cognito_user_pools
+  listParticipants(filter: ModelParticipantFilterInput, limit: Int, nextToken: String): ModelParticipantConnection @aws_iam @aws_cognito_user_pools
+  participantsByLobbyId(lobbyId: ID!, sortDirection: ModelSortDirection, filter: ModelParticipantFilterInput, limit: Int, nextToken: String): ModelParticipantConnection @aws_iam @aws_cognito_user_pools
+  participantsByUserId(userId: ID!, sortDirection: ModelSortDirection, filter: ModelParticipantFilterInput, limit: Int, nextToken: String): ModelParticipantConnection @aws_iam @aws_cognito_user_pools
+}
+
+input ModelGameRoundConditionInput {
+  index: ModelIntInput
+  question: ModelStringInput
+  correctAnswer: ModelStringInput
+  isComplete: ModelBooleanInput
+  gameSessionID: ModelIDInput
+  updatedAt: ModelStringInput
+  createdAt: ModelStringInput
+  and: [ModelGameRoundConditionInput]
+  or: [ModelGameRoundConditionInput]
+  not: ModelGameRoundConditionInput
+}
+
+input CreateGameRoundInput {
+  id: ID
+  index: Int!
+  question: String!
+  correctAnswer: String!
+  isComplete: Boolean!
+  gameSessionID: ID!
+  updatedAt: AWSDateTime
+  createdAt: AWSDateTime
+}
+
+input UpdateGameRoundInput {
+  id: ID!
+  index: Int
+  question: String
+  correctAnswer: String
+  isComplete: Boolean
+  gameSessionID: ID
+  updatedAt: AWSDateTime
+  createdAt: AWSDateTime
+}
+
+input DeleteGameRoundInput {
+  id: ID!
+}
+
+type Mutation {
+  createGameRound(input: CreateGameRoundInput!, condition: ModelGameRoundConditionInput): GameRound @aws_iam @aws_cognito_user_pools
+  updateGameRound(input: UpdateGameRoundInput!, condition: ModelGameRoundConditionInput): GameRound @aws_iam @aws_cognito_user_pools
+  deleteGameRound(input: DeleteGameRoundInput!, condition: ModelGameRoundConditionInput): GameRound @aws_iam @aws_cognito_user_pools
+  createSubmittedAnswer(input: CreateSubmittedAnswerInput!, condition: ModelSubmittedAnswerConditionInput): SubmittedAnswer @aws_iam @aws_cognito_user_pools
+  updateSubmittedAnswer(input: UpdateSubmittedAnswerInput!, condition: ModelSubmittedAnswerConditionInput): SubmittedAnswer @aws_iam @aws_cognito_user_pools
+  deleteSubmittedAnswer(input: DeleteSubmittedAnswerInput!, condition: ModelSubmittedAnswerConditionInput): SubmittedAnswer @aws_iam @aws_cognito_user_pools
+  createGameSession(input: CreateGameSessionInput!, condition: ModelGameSessionConditionInput): GameSession @aws_iam @aws_cognito_user_pools
+  updateGameSession(input: UpdateGameSessionInput!, condition: ModelGameSessionConditionInput): GameSession @aws_iam @aws_cognito_user_pools
+  deleteGameSession(input: DeleteGameSessionInput!, condition: ModelGameSessionConditionInput): GameSession @aws_iam @aws_cognito_user_pools
+  createLobby(input: CreateLobbyInput!, condition: ModelLobbyConditionInput): Lobby @aws_iam @aws_cognito_user_pools
+  updateLobby(input: UpdateLobbyInput!, condition: ModelLobbyConditionInput): Lobby @aws_iam @aws_cognito_user_pools
+  deleteLobby(input: DeleteLobbyInput!, condition: ModelLobbyConditionInput): Lobby @aws_iam @aws_cognito_user_pools
+  updateUser(input: UpdateUserInput!, condition: ModelUserConditionInput): User @aws_iam @aws_cognito_user_pools
+  createParticipant(input: CreateParticipantInput!, condition: ModelParticipantConditionInput): Participant @aws_iam @aws_cognito_user_pools
+  updateParticipant(input: UpdateParticipantInput!, condition: ModelParticipantConditionInput): Participant @aws_iam @aws_cognito_user_pools
+  deleteParticipant(input: DeleteParticipantInput!, condition: ModelParticipantConditionInput): Participant @aws_iam @aws_cognito_user_pools
+}
+
+input ModelSubscriptionGameRoundFilterInput {
+  id: ModelSubscriptionIDInput
+  index: ModelSubscriptionIntInput
+  question: ModelSubscriptionStringInput
+  correctAnswer: ModelSubscriptionStringInput
+  isComplete: ModelSubscriptionBooleanInput
+  gameSessionID: ModelSubscriptionIDInput
+  updatedAt: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionGameRoundFilterInput]
+  or: [ModelSubscriptionGameRoundFilterInput]
+}
+
+type Subscription {
+  onCreateGameRound(filter: ModelSubscriptionGameRoundFilterInput): GameRound @aws_subscribe(mutations: ["createGameRound"]) @aws_iam @aws_cognito_user_pools
+  onUpdateGameRound(filter: ModelSubscriptionGameRoundFilterInput): GameRound @aws_subscribe(mutations: ["updateGameRound"]) @aws_iam @aws_cognito_user_pools
+  onDeleteGameRound(filter: ModelSubscriptionGameRoundFilterInput): GameRound @aws_subscribe(mutations: ["deleteGameRound"]) @aws_iam @aws_cognito_user_pools
+  onCreateSubmittedAnswer(filter: ModelSubscriptionSubmittedAnswerFilterInput): SubmittedAnswer @aws_subscribe(mutations: ["createSubmittedAnswer"]) @aws_iam @aws_cognito_user_pools
+  onUpdateSubmittedAnswer(filter: ModelSubscriptionSubmittedAnswerFilterInput): SubmittedAnswer @aws_subscribe(mutations: ["updateSubmittedAnswer"]) @aws_iam @aws_cognito_user_pools
+  onDeleteSubmittedAnswer(filter: ModelSubscriptionSubmittedAnswerFilterInput): SubmittedAnswer @aws_subscribe(mutations: ["deleteSubmittedAnswer"]) @aws_iam @aws_cognito_user_pools
+  onCreateGameSession(filter: ModelSubscriptionGameSessionFilterInput): GameSession @aws_subscribe(mutations: ["createGameSession"]) @aws_iam @aws_cognito_user_pools
+  onUpdateGameSession(filter: ModelSubscriptionGameSessionFilterInput): GameSession @aws_subscribe(mutations: ["updateGameSession"]) @aws_iam @aws_cognito_user_pools
+  onDeleteGameSession(filter: ModelSubscriptionGameSessionFilterInput): GameSession @aws_subscribe(mutations: ["deleteGameSession"]) @aws_iam @aws_cognito_user_pools
+  onCreateLobby(filter: ModelSubscriptionLobbyFilterInput): Lobby @aws_subscribe(mutations: ["createLobby"]) @aws_iam @aws_cognito_user_pools
+  onUpdateLobby(filter: ModelSubscriptionLobbyFilterInput): Lobby @aws_subscribe(mutations: ["updateLobby"]) @aws_iam @aws_cognito_user_pools
+  onDeleteLobby(filter: ModelSubscriptionLobbyFilterInput): Lobby @aws_subscribe(mutations: ["deleteLobby"]) @aws_iam @aws_cognito_user_pools
+  onUpdateUser(filter: ModelSubscriptionUserFilterInput): User @aws_subscribe(mutations: ["updateUser"]) @aws_iam @aws_cognito_user_pools
+  onCreateParticipant(filter: ModelSubscriptionParticipantFilterInput): Participant @aws_subscribe(mutations: ["createParticipant"]) @aws_iam @aws_cognito_user_pools
+  onUpdateParticipant(filter: ModelSubscriptionParticipantFilterInput): Participant @aws_subscribe(mutations: ["updateParticipant"]) @aws_iam @aws_cognito_user_pools
+  onDeleteParticipant(filter: ModelSubscriptionParticipantFilterInput): Participant @aws_subscribe(mutations: ["deleteParticipant"]) @aws_iam @aws_cognito_user_pools
+}
+
+type ModelSubmittedAnswerConnection @aws_iam @aws_cognito_user_pools {
+  items: [SubmittedAnswer]!
+  nextToken: String
+}
+
+input ModelSubmittedAnswerFilterInput {
+  id: ModelIDInput
+  answer: ModelStringInput
+  isCorrect: ModelBooleanInput
+  userID: ModelIDInput
+  gameRoundID: ModelIDInput
+  updatedAt: ModelStringInput
+  createdAt: ModelStringInput
+  and: [ModelSubmittedAnswerFilterInput]
+  or: [ModelSubmittedAnswerFilterInput]
+  not: ModelSubmittedAnswerFilterInput
+}
+
+input ModelSubmittedAnswerConditionInput {
+  answer: ModelStringInput
+  isCorrect: ModelBooleanInput
+  userID: ModelIDInput
+  gameRoundID: ModelIDInput
+  updatedAt: ModelStringInput
+  createdAt: ModelStringInput
+  and: [ModelSubmittedAnswerConditionInput]
+  or: [ModelSubmittedAnswerConditionInput]
+  not: ModelSubmittedAnswerConditionInput
+}
+
+input CreateSubmittedAnswerInput {
+  id: ID
+  answer: String!
+  isCorrect: Boolean
+  userID: ID!
+  gameRoundID: ID!
+  updatedAt: AWSDateTime
+  createdAt: AWSDateTime
+}
+
+input UpdateSubmittedAnswerInput {
+  id: ID!
+  answer: String
+  isCorrect: Boolean
+  userID: ID
+  gameRoundID: ID
+  updatedAt: AWSDateTime
+  createdAt: AWSDateTime
+}
+
+input DeleteSubmittedAnswerInput {
+  id: ID!
+}
+
+input ModelSubscriptionSubmittedAnswerFilterInput {
+  id: ModelSubscriptionIDInput
+  answer: ModelSubscriptionStringInput
+  isCorrect: ModelSubscriptionBooleanInput
+  userID: ModelSubscriptionIDInput
+  gameRoundID: ModelSubscriptionIDInput
+  updatedAt: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionSubmittedAnswerFilterInput]
+  or: [ModelSubscriptionSubmittedAnswerFilterInput]
+}
+
+type ModelGameSessionConnection @aws_iam @aws_cognito_user_pools {
+  items: [GameSession]!
+  nextToken: String
+}
+
+input ModelGameSessionFilterInput {
+  id: ModelIDInput
+  lobbyID: ModelIDInput
+  updatedAt: ModelStringInput
+  createdAt: ModelStringInput
+  and: [ModelGameSessionFilterInput]
+  or: [ModelGameSessionFilterInput]
+  not: ModelGameSessionFilterInput
+}
+
+input ModelGameSessionConditionInput {
+  lobbyID: ModelIDInput
+  updatedAt: ModelStringInput
+  createdAt: ModelStringInput
+  and: [ModelGameSessionConditionInput]
+  or: [ModelGameSessionConditionInput]
+  not: ModelGameSessionConditionInput
+}
+
+input CreateGameSessionInput {
+  id: ID
+  lobbyID: ID!
+  updatedAt: AWSDateTime
+  createdAt: AWSDateTime
+}
+
+input UpdateGameSessionInput {
+  id: ID!
+  lobbyID: ID
+  updatedAt: AWSDateTime
+  createdAt: AWSDateTime
+}
+
+input DeleteGameSessionInput {
+  id: ID!
+}
+
+input ModelSubscriptionGameSessionFilterInput {
+  id: ModelSubscriptionIDInput
+  lobbyID: ModelSubscriptionIDInput
+  updatedAt: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionGameSessionFilterInput]
+  or: [ModelSubscriptionGameSessionFilterInput]
+}
+
+type ModelLobbyConnection @aws_iam @aws_cognito_user_pools {
+  items: [Lobby]!
+  nextToken: String
+}
+
+input ModelLobbyFilterInput {
+  id: ModelIDInput
+  code: ModelStringInput
+  isActive: ModelBooleanInput
+  creatorID: ModelIDInput
+  gameSessionID: ModelIDInput
+  updatedAt: ModelStringInput
+  createdAt: ModelStringInput
+  and: [ModelLobbyFilterInput]
+  or: [ModelLobbyFilterInput]
+  not: ModelLobbyFilterInput
+}
+
+input ModelLobbyConditionInput {
+  code: ModelStringInput
+  isActive: ModelBooleanInput
+  creatorID: ModelIDInput
+  gameSessionID: ModelIDInput
+  updatedAt: ModelStringInput
+  createdAt: ModelStringInput
+  and: [ModelLobbyConditionInput]
+  or: [ModelLobbyConditionInput]
+  not: ModelLobbyConditionInput
+}
+
+input CreateLobbyInput {
+  id: ID
+  code: String!
+  isActive: Boolean!
+  creatorID: ID!
+  gameSessionID: ID
+  updatedAt: AWSDateTime
+  createdAt: AWSDateTime
+}
+
+input UpdateLobbyInput {
+  id: ID!
+  code: String
+  isActive: Boolean
+  creatorID: ID
+  gameSessionID: ID
+  updatedAt: AWSDateTime
+  createdAt: AWSDateTime
+}
+
+input DeleteLobbyInput {
+  id: ID!
+}
+
+input ModelSubscriptionLobbyFilterInput {
+  id: ModelSubscriptionIDInput
+  code: ModelSubscriptionStringInput
+  isActive: ModelSubscriptionBooleanInput
+  creatorID: ModelSubscriptionIDInput
+  gameSessionID: ModelSubscriptionIDInput
+  updatedAt: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionLobbyFilterInput]
+  or: [ModelSubscriptionLobbyFilterInput]
+}
+
+input AnswerInput {
+  text: String!
+  isCorrect: Boolean!
+}
+
+type ModelUserConnection @aws_iam @aws_cognito_user_pools {
+  items: [User]!
+  nextToken: String
+}
+
+input ModelUserStatusInput {
+  eq: UserStatus
+  ne: UserStatus
+}
+
+input ModelUserTypeInput {
+  eq: UserType
+  ne: UserType
+}
+
+input ModelUserFilterInput {
+  id: ModelIDInput
+  email: ModelStringInput
+  name: ModelStringInput
+  selfie: ModelStringInput
+  status: ModelUserStatusInput
+  type: ModelUserTypeInput
+  updatedAt: ModelStringInput
+  createdAt: ModelStringInput
+  and: [ModelUserFilterInput]
+  or: [ModelUserFilterInput]
+  not: ModelUserFilterInput
+}
+
+input ModelUserConditionInput {
+  email: ModelStringInput
+  name: ModelStringInput
+  selfie: ModelStringInput
+  status: ModelUserStatusInput
+  type: ModelUserTypeInput
+  updatedAt: ModelStringInput
+  createdAt: ModelStringInput
+  and: [ModelUserConditionInput]
+  or: [ModelUserConditionInput]
+  not: ModelUserConditionInput
+}
+
+input UpdateUserInput {
+  id: ID!
+  email: AWSEmail
+  name: String
+  selfie: String
+  status: UserStatus
+  type: UserType
+  updatedAt: AWSDateTime
+  createdAt: AWSDateTime
+}
+
+input ModelSubscriptionUserFilterInput {
+  id: ModelSubscriptionIDInput
+  email: ModelSubscriptionStringInput
+  name: ModelSubscriptionStringInput
+  selfie: ModelSubscriptionStringInput
+  status: ModelSubscriptionStringInput
+  type: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  createdAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionUserFilterInput]
+  or: [ModelSubscriptionUserFilterInput]
+}
+
+type ModelParticipantConnection @aws_iam @aws_cognito_user_pools {
+  items: [Participant]!
+  nextToken: String
+}
+
+input ModelParticipantFilterInput {
+  id: ModelIDInput
+  lobbyId: ModelIDInput
+  userId: ModelIDInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+  and: [ModelParticipantFilterInput]
+  or: [ModelParticipantFilterInput]
+  not: ModelParticipantFilterInput
+}
+
+input ModelParticipantConditionInput {
+  lobbyId: ModelIDInput
+  userId: ModelIDInput
+  and: [ModelParticipantConditionInput]
+  or: [ModelParticipantConditionInput]
+  not: ModelParticipantConditionInput
+  createdAt: ModelStringInput
+  updatedAt: ModelStringInput
+}
+
+input CreateParticipantInput {
+  id: ID
+  lobbyId: ID!
+  userId: ID!
+}
+
+input UpdateParticipantInput {
+  id: ID!
+  lobbyId: ID
+  userId: ID
+}
+
+input DeleteParticipantInput {
+  id: ID!
+}
+
+input ModelSubscriptionParticipantFilterInput {
+  id: ModelSubscriptionIDInput
+  lobbyId: ModelSubscriptionIDInput
+  userId: ModelSubscriptionIDInput
+  createdAt: ModelSubscriptionStringInput
+  updatedAt: ModelSubscriptionStringInput
+  and: [ModelSubscriptionParticipantFilterInput]
+  or: [ModelSubscriptionParticipantFilterInput]
+}
