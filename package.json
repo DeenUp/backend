@@ -1,55 +1,47 @@
 {
-	"name": "@deenup/deendown",
-	"version": "0.1.0",
-	"description": "Backend for DeenUp",
-	"private": true,
-	"engines": {
-		"node": ">=20.11.0"
-	},
-	"packageManager": "pnpm@9.1.1",
-	"repository": {
-		"type": "git",
-		"url": "git+https://github.com/zxcvbnmmohd/DeenDown.git"
-	},
-	"bugs": {
-		"url": "https://github.com/zxcvbnmmohd/DeenDown/issues"
-	},
+	"name": "backend-migration",
+	"version": "1.0.0",
+	"description": "",
+	"main": "index.js",
 	"scripts": {
-		"amplify:AdminQueriesd82aff64": "cd amplify/backend/function/AdminQueriesd82aff64/src && pnpm i && pnpm build && cd -",
-		"amplify:DeenDownAuthCustomMessage": "cd amplify/backend/function/DeenDownAuthCustomMessage/src && pnpm i && pnpm build && cd -",
-		"amplify:DeenDownAuthPostAuthentication": "cd amplify/backend/function/DeenDownAuthPostAuthentication/src && pnpm i && pnpm build && cd -",
-		"amplify:DeenDownAuthPostConfirmation": "cd amplify/backend/function/DeenDownAuthPostConfirmation/src && pnpm i && pnpm build && cd -",
-		"amplify:DeenDownAuthPreAuthentication": "cd amplify/backend/function/DeenDownAuthPreAuthentication/src && pnpm i && pnpm build && cd -",
-		"amplify:DeenDownAuthPreSignup": "cd amplify/backend/function/DeenDownAuthPreSignup/src && pnpm i && pnpm build && cd -",
+		"test": "echo \"Error: no test specified\" && exit 1",
 		"format": "prettier --check .",
 		"format:fix": "prettier --write .",
-		"lint": "eslint . --ext .ts",
-		"lint:fix": "eslint . --ext .ts --fix",
-		"typecheck": "tsc --noEmit",
-		"prepare": "husky"
+		"lint": "eslint .",
+		"lint:fix": "eslint . --fix",
+		"typecheck": "tsc --noEmit"
 	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
 	"devDependencies": {
+		"@aws-amplify/backend": "^1.0.3",
+		"@aws-amplify/backend-cli": "^1.0.4",
+		"@aws-sdk/client-cognito-identity-provider": "^3.588.0",
+		"@eslint/js": "^9.4.0",
+		"@types/amplify": "^1.1.28",
+		"@types/aws-lambda": "^8.10.138",
 		"@typescript-eslint/eslint-plugin": "^6.7.5",
 		"@typescript-eslint/parser": "^6.7.5",
+		"aws-cdk": "^2",
+		"aws-cdk-lib": "^2",
+		"constructs": "^10.0.0",
 		"enforce-branch-name": "^1.1.2",
-		"eslint": "^8.51.0",
+		"esbuild": "^0.21.4",
+		"eslint": "^9.4.0",
 		"eslint-config-prettier": "^9.0.0",
+		"eslint-plugin-import": "^2.29.1",
 		"eslint-plugin-prettier": "^5.0.0",
 		"eslint-plugin-security": "^1.7.1",
 		"eslint-plugin-simple-import-sort": "^10.0.0",
-		"husky": "^9.0.11",
-		"lint-staged": "^15.2.2",
-		"pnpm": "^9.0.6",
-		"prettier": "^3.2.5"
+		"eslint-plugin-unused-imports": "^3.2.0",
+		"globals": "^15.3.0",
+		"prettier": "^3.2.5",
+		"tsx": "^4.11.0",
+		"typescript": "^5.4.5",
+		"typescript-eslint": "^7.11.0"
 	},
-	"husky": {
-		"hooks": {
-			"pre-commit": "lint-staged"
-		}
-	},
-	"lint-staged": {
-		"*.*": [
-			"pnpm format:fix"
-		]
+	"dependencies": {
+		"aws-amplify": "^6.3.4"
 	}
 }
